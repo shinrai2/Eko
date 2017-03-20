@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Eko</string>
+    <string name="host_tips">Host Clicked.</string>
+    <string name="host_text">Host is Here.</string>
+    <string name="open_wireless_text">Turn on wireless hotspots</string>
+    <string name="close_wireless_text">Turn off wireless hotspots</string>
 </resources>

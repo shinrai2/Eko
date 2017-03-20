@@ -4,11 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context="cc.shinrai.eko.MainActivity">
+    tools:context="cc.shinrai.eko.HostActivity">
 
     <LinearLayout
         android:orientation="vertical"
@@ -17,18 +17,18 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true">
 
-        <Button
-            android:layout_width="match_parent"
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Host"
-            android:id="@+id/host"
+            android:text="@string/host_text"
+            android:id="@+id/textView"
             android:layout_gravity="center_horizontal"/>
 
         <Button
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Guest"
-            android:id="@+id/guset"
+            android:text="@string/open_wireless_text"
+            android:id="@+id/wireless_button"
             android:layout_gravity="center_horizontal"/>
     </LinearLayout>
 </RelativeLayout>
