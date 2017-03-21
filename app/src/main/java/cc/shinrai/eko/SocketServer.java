@@ -13,6 +13,7 @@ import java.net.Socket;
  * Created by Shinrai on 2017/3/21 0021.
  */
 public class SocketServer {
+    private Thread t = null;
     private ServerSocket server;
     private Socket socket;
     private InputStream in;
@@ -41,7 +42,7 @@ public class SocketServer {
      * */
     public void beginListen()
     {
-        new Thread(new Runnable ()
+        t = new Thread(new Runnable ()
         {
             @Override
             public void run()
@@ -80,7 +81,8 @@ public class SocketServer {
                     socket.isClosed ();
                 }
             }
-        } ).start ();
+        } );
+        t.start();
     }
 
     /**

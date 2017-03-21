@@ -3,6 +3,8 @@ package cc.shinrai.eko;
 import android.content.Context;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -14,7 +16,6 @@ import java.lang.reflect.Method;
 public class HostActivity extends AppCompatActivity {
 
     private Button mWirelessButton;
-    private Button mRemoveButton;
     private WifiManager wifiManager;
     private boolean ap_state;//记录AP状态
     private boolean wifi_state = false;//记录开启AP前wifi状态
@@ -27,7 +28,6 @@ public class HostActivity extends AppCompatActivity {
 
         wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
         mWirelessButton = (Button)findViewById(R.id.wireless_button);
-        mRemoveButton = (Button)findViewById(R.id.remove_button);
         if(isWifiApEnabled()) {
             mWirelessButton.setText(R.string.close_wireless_text);
             ap_state = true;
@@ -36,6 +36,10 @@ public class HostActivity extends AppCompatActivity {
             mWirelessButton.setText(R.string.open_wireless_text);
             ap_state = false;
         }
+
+        /**socket服务端开始监听*/
+        server.beginListen();
+
         mWirelessButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -55,12 +59,16 @@ public class HostActivity extends AppCompatActivity {
                 }
             }
         });
-        mRemoveButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
 
+        /**socket收到消息线程*/
+        SocketServer.ServerHandler=new Handler(){
+            @Override
+            public void handleMessage(Message msg)
+            {
+                Toast.makeText(HostActivity.this,
+                        msg.toString(),Toast.LENGTH_SHORT).show();
             }
-        });
+        };
     }
 
     // wifi热点开关
