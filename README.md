@@ -1,3 +1,3 @@
-# 模仿 AmpMe 的将数台 Android 设备组合成一套环绕音响系统
+# 模仿 AmpMe 将数台 Android 设备组合成一套环绕音响系统
 
 - Coding...
