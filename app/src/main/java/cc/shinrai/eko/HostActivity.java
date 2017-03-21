@@ -14,9 +14,11 @@ import java.lang.reflect.Method;
 public class HostActivity extends AppCompatActivity {
 
     private Button mWirelessButton;
+    private Button mRemoveButton;
     private WifiManager wifiManager;
-    private boolean flag = false;//记录AP状态
+    private boolean ap_state;//记录AP状态
     private boolean wifi_state = false;//记录开启AP前wifi状态
+    private SocketServer server=new SocketServer(6666);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,19 +27,38 @@ public class HostActivity extends AppCompatActivity {
 
         wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
         mWirelessButton = (Button)findViewById(R.id.wireless_button);
+        mRemoveButton = (Button)findViewById(R.id.remove_button);
+        if(isWifiApEnabled()) {
+            mWirelessButton.setText(R.string.close_wireless_text);
+            ap_state = true;
+        }
+        else {
+            mWirelessButton.setText(R.string.open_wireless_text);
+            ap_state = false;
+        }
         mWirelessButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //如果是打开状态就关闭，如果是关闭就打开
-                flag=!flag;
-                setWifiApEnabled(flag);
-                if (!flag && wifi_state) {//判断是否要重新连接wifi
+                ap_state=!ap_state;
+                boolean setApReturn = setWifiApEnabled(ap_state);
+                if (!ap_state && wifi_state && setApReturn) {//判断是否要重新连接wifi
                     wifiManager.setWifiEnabled(true);
                     wifi_state = false;
                 }
                 //Button标签切换
-                if(flag) mWirelessButton.setText(R.string.close_wireless_text);
-                else mWirelessButton.setText(R.string.open_wireless_text);
+                if(ap_state) {
+                    mWirelessButton.setText(R.string.close_wireless_text);
+                }
+                else {
+                    mWirelessButton.setText(R.string.open_wireless_text);
+                }
+            }
+        });
+        mRemoveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
             }
         });
     }
@@ -74,5 +95,29 @@ public class HostActivity extends AppCompatActivity {
         } catch (Exception e) {
             return false;
         }
+    }
+    //检测AP状态
+    public boolean isWifiApEnabled() {
+        return getWifiApState() == WIFI_AP_STATE.WIFI_AP_STATE_ENABLED;
+    }
+    private WIFI_AP_STATE getWifiApState(){
+        int tmp;
+        try {
+            Method method = wifiManager.getClass().getMethod(
+                    "getWifiApState");
+            tmp = ((Integer) method.invoke(wifiManager));
+            // Fix for Android 4
+            if (tmp > 10) {
+                tmp = tmp - 10;
+            }
+            return WIFI_AP_STATE.class.getEnumConstants()[tmp];
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return WIFI_AP_STATE.WIFI_AP_STATE_FAILED;
+        }
+    }
+    public enum WIFI_AP_STATE {
+        WIFI_AP_STATE_DISABLING, WIFI_AP_STATE_DISABLED, WIFI_AP_STATE_ENABLING,  WIFI_AP_STATE_ENABLED, WIFI_AP_STATE_FAILED
     }
 }
