@@ -15,19 +15,20 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true">
+        android:layout_centerHorizontal="true"
+        tools:ignore="UselessParent">
 
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Host"
+            android:text="@string/host"
             android:id="@+id/host"
             android:layout_gravity="center_horizontal"/>
 
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Guest"
+            android:text="@string/guest"
             android:id="@+id/guset"
             android:layout_gravity="center_horizontal"/>
     </LinearLayout>

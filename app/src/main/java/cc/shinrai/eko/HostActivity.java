@@ -19,14 +19,13 @@ public class HostActivity extends AppCompatActivity {
     private WifiManager wifiManager;
     private boolean ap_state;//记录AP状态
     private boolean wifi_state = false;//记录开启AP前wifi状态
-    private SocketServer server=new SocketServer(6666);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_host);
 
-        wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+        wifiManager = (WifiManager)getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         mWirelessButton = (Button)findViewById(R.id.wireless_button);
         if(isWifiApEnabled()) {
             mWirelessButton.setText(R.string.close_wireless_text);
@@ -36,9 +35,6 @@ public class HostActivity extends AppCompatActivity {
             mWirelessButton.setText(R.string.open_wireless_text);
             ap_state = false;
         }
-
-        /**socket服务端开始监听*/
-        server.beginListen();
 
         mWirelessButton.setOnClickListener(new View.OnClickListener() {
             @Override

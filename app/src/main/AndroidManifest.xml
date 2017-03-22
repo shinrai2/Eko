@@ -22,6 +22,7 @@
         </activity>
         <activity android:name=".HostActivity">
         </activity>
+        <service android:name=".HostService" />
     </application>
 
 </manifest>

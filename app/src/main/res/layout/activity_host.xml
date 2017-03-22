@@ -17,8 +17,7 @@
         android:text="@string/host_text"
         android:id="@+id/textView"
         android:layout_gravity="center_horizontal"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"/>
+        />
 
     <android.support.percent.PercentRelativeLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
@@ -28,7 +27,7 @@
         android:layout_weight="13"
         android:clickable="true"
         android:id="@+id/view"
-        android:layout_below="@+id/textView">
+        >
 
         <ImageView
             android:layout_height="0dp"
@@ -37,7 +36,8 @@
             app:layout_aspectRatio="100%"
             android:id="@+id/musicCover"
             android:layout_centerHorizontal="true"
-            android:src="@drawable/music_cover"/>
+            android:src="@drawable/music_cover"
+            android:contentDescription="@string/music_cover"/>
 
     </android.support.percent.PercentRelativeLayout>
 
@@ -47,9 +47,7 @@
         android:layout_height="0dp"
         android:layout_weight="2"
         android:layout_gravity="center_horizontal"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@id/view">
+        >
 
         <Button
             android:layout_width="wrap_content"
