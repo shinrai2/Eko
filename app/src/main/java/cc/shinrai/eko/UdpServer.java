@@ -1,5 +1,6 @@
 package cc.shinrai.eko;
 
+import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -24,32 +25,36 @@ public class UdpServer {
             e.printStackTrace();
         }
     }
-    public void sendMessage() {
+    public void sendMessage(String msg, final Context context) {
         Log.i("udp","before send.");
+        Toast.makeText(context, "send",
+                Toast.LENGTH_SHORT).show();
 
         try {
             mSocket.setTimeToLive(4);
             //将本机的IP（这里可以写动态获取的IP）地址放到数据包里，其实server端接收到数据包后也能获取到发包方的IP的
-            byte[] data = "192.168.199.123".getBytes();
+            byte[] data = msg.getBytes();
             //224.0.0.1为广播地址
             InetAddress address = InetAddress.getByName("224.0.0.1");
             //这个地方可以输出判断该地址是不是广播类型的地址
             System.out.println(address.isMulticastAddress());
             dataPacket = new DatagramPacket(data, data.length, address,
                     8003);
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        mSocket.send(dataPacket);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    mSocket.close();
-                }
-            }).start();
         } catch (Exception e) {
             e.printStackTrace();
         }
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    mSocket.send(dataPacket);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+    public void closeSocket() {
+        mSocket.close();
     }
 }

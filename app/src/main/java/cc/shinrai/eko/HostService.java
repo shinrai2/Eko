@@ -11,6 +11,7 @@ import android.support.annotation.Nullable;
 
 public class HostService extends IntentService {
     private static final String TAG = "HostService";
+    private UdpServer udpServer = null;
 
     /**
      * Creates an IntentService.  Invoked by your subclass's constructor.
@@ -22,6 +23,8 @@ public class HostService extends IntentService {
     }
     public HostService(){
         this(TAG);
+        if(udpServer == null)
+            udpServer = new UdpServer();
     }
 
     @Override

@@ -16,6 +16,7 @@ import java.lang.reflect.Method;
 public class HostActivity extends AppCompatActivity {
 
     private Button mWirelessButton;
+    private Button mSendButton;
     private WifiManager wifiManager;
     private boolean ap_state;//记录AP状态
     private boolean wifi_state = false;//记录开启AP前wifi状态
@@ -27,6 +28,7 @@ public class HostActivity extends AppCompatActivity {
 
         wifiManager = (WifiManager)getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         mWirelessButton = (Button)findViewById(R.id.wireless_button);
+        mSendButton = (Button)findViewById(R.id.sned_button);
         if(isWifiApEnabled()) {
             mWirelessButton.setText(R.string.close_wireless_text);
             ap_state = true;
@@ -55,17 +57,13 @@ public class HostActivity extends AppCompatActivity {
                 }
             }
         });
-        new UdpServer().sendMessage();
-//
-//        /**socket收到消息线程*/
-//        SocketServer.ServerHandler=new Handler(){
-//            @Override
-//            public void handleMessage(Message msg)
-//            {
-//                Toast.makeText(HostActivity.this,
-//                        msg.toString(),Toast.LENGTH_SHORT).show();
-//            }
-//        };
+        mSendButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+//                udpServer.sendMessage("192.168.199.123", HostActivity.this);
+            }
+        });
     }
 
     // wifi热点开关
@@ -124,5 +122,11 @@ public class HostActivity extends AppCompatActivity {
     }
     public enum WIFI_AP_STATE {
         WIFI_AP_STATE_DISABLING, WIFI_AP_STATE_DISABLED, WIFI_AP_STATE_ENABLING,  WIFI_AP_STATE_ENABLED, WIFI_AP_STATE_FAILED
+    }
+
+    @Override
+    protected void onDestroy() {
+        udpServer.closeSocket();
+        super.onDestroy();
     }
 }
