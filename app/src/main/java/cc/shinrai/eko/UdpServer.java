@@ -25,10 +25,8 @@ public class UdpServer {
             e.printStackTrace();
         }
     }
-    public void sendMessage(String msg, final Context context) {
+    public void sendMessage(String msg) {
         Log.i("udp","before send.");
-        Toast.makeText(context, "send",
-                Toast.LENGTH_SHORT).show();
 
         try {
             mSocket.setTimeToLive(4);
@@ -39,7 +37,7 @@ public class UdpServer {
             //这个地方可以输出判断该地址是不是广播类型的地址
             System.out.println(address.isMulticastAddress());
             dataPacket = new DatagramPacket(data, data.length, address,
-                    8003);
+                    8004);
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -1,12 +1,14 @@
 package cc.shinrai.eko;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -17,9 +19,10 @@ public class HostActivity extends AppCompatActivity {
 
     private Button mWirelessButton;
     private Button mSendButton;
+    private Intent i = null;  //HostService
     private WifiManager wifiManager;
-    private boolean ap_state;//记录AP状态
-    private boolean wifi_state = false;//记录开启AP前wifi状态
+    private boolean ap_state;  //记录AP状态
+    private boolean wifi_state = false;  //记录开启AP前wifi状态
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,8 +63,8 @@ public class HostActivity extends AppCompatActivity {
         mSendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-//                udpServer.sendMessage("192.168.199.123", HostActivity.this);
+                i = HostService.newIntent(HostActivity.this);
+                startService(i);
             }
         });
     }
@@ -126,7 +129,11 @@ public class HostActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        udpServer.closeSocket();
+//        udpServer.closeSocket();
+        if(i != null) {
+            Boolean b = stopService(i);
+            Log.i("onDestroy", "stopService : " + b.toString());
+        }
         super.onDestroy();
     }
 }

@@ -4,6 +4,9 @@ import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.Nullable;
+import android.util.Log;
+
+import java.text.SimpleDateFormat;
 
 /**
  * Created by Shinrai on 2017/3/22 0022.
@@ -29,10 +32,42 @@ public class HostService extends IntentService {
 
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
-
+        Log.i("Service", "onHandleIntent");
+        while (true) {
+            udpServer.sendMessage(new SimpleDateFormat("hh:mm:ss").format(new java.util.Date()));
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public static Intent newIntent(Context context) {
         return new Intent(context, HostService.class);
+    }
+
+    @Override
+    public void onDestroy() {
+        udpServer.closeSocket();
+        super.onDestroy();
+    }
+
+    @Override
+    public void onStart(@Nullable Intent intent, int startId) {
+        Log.i("HostService","onStart");
+        super.onStart(intent, startId);
+    }
+
+    @Override
+    public int onStartCommand(@Nullable Intent intent, int flags, int startId) {
+        Log.i("HostService", "onStartCommand");
+        return super.onStartCommand(intent, flags, startId);
+    }
+
+    @Override
+    public void onCreate() {
+        Log.i("HostService", "onCreate");
+        super.onCreate();
     }
 }
