@@ -1,5 +1,8 @@
 package cc.shinrai.eko;
 
+import android.util.Log;
+import android.widget.Toast;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
@@ -11,29 +14,42 @@ import java.net.MulticastSocket;
 
 public class UdpServer {
     private MulticastSocket mSocket;
-    private InetAddress group;
+    private DatagramPacket dataPacket = null;
 
 
     public UdpServer() {
         try {
-            mSocket = new MulticastSocket(7412);
-            group = InetAddress.getByName("239.0.0.1");
-        } catch (IOException e) {
+            mSocket = new MulticastSocket();
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
     public void sendMessage() {
+        Log.i("udp","before send.");
+
         try {
-            byte[] buff = "QQ".getBytes("utf-8");
-            mSocket.joinGroup(group);
             mSocket.setTimeToLive(4);
-            DatagramPacket packet = new DatagramPacket(
-                    buff, buff.length, group, 7412);
-            mSocket.send(packet);
+            //将本机的IP（这里可以写动态获取的IP）地址放到数据包里，其实server端接收到数据包后也能获取到发包方的IP的
+            byte[] data = "192.168.199.123".getBytes();
+            //224.0.0.1为广播地址
+            InetAddress address = InetAddress.getByName("224.0.0.1");
+            //这个地方可以输出判断该地址是不是广播类型的地址
+            System.out.println(address.isMulticastAddress());
+            dataPacket = new DatagramPacket(data, data.length, address,
+                    8003);
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        mSocket.send(dataPacket);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    mSocket.close();
+                }
+            }).start();
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            mSocket.close();
         }
     }
 }

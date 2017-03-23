@@ -55,16 +55,17 @@ public class HostActivity extends AppCompatActivity {
                 }
             }
         });
-
-        /**socket收到消息线程*/
-        SocketServer.ServerHandler=new Handler(){
-            @Override
-            public void handleMessage(Message msg)
-            {
-                Toast.makeText(HostActivity.this,
-                        msg.toString(),Toast.LENGTH_SHORT).show();
-            }
-        };
+        new UdpServer().sendMessage();
+//
+//        /**socket收到消息线程*/
+//        SocketServer.ServerHandler=new Handler(){
+//            @Override
+//            public void handleMessage(Message msg)
+//            {
+//                Toast.makeText(HostActivity.this,
+//                        msg.toString(),Toast.LENGTH_SHORT).show();
+//            }
+//        };
     }
 
     // wifi热点开关
