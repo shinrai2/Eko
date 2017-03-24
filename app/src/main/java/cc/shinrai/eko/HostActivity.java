@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import java.lang.reflect.Method;
@@ -19,6 +20,7 @@ public class HostActivity extends AppCompatActivity {
 
     private Button mWirelessButton;
     private Button mSendButton;
+    private ImageView mMusicCover;
     private Intent i = null;  //HostService
     private WifiManager wifiManager;
     private boolean ap_state;  //记录AP状态
@@ -27,9 +29,13 @@ public class HostActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getSupportActionBar().hide();
         setContentView(R.layout.activity_host);
 
-        wifiManager = (WifiManager)getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        wifiManager = (WifiManager)getApplicationContext()
+                .getSystemService(Context.WIFI_SERVICE);
+        mMusicCover = (ImageView)findViewById(R.id.musicCover);
+//        mMusicCover.setImageDrawable(getResources().getDrawable(R.drawable.music_cover));
         mWirelessButton = (Button)findViewById(R.id.wireless_button);
         mSendButton = (Button)findViewById(R.id.sned_button);
         if(isWifiApEnabled()) {
@@ -45,12 +51,15 @@ public class HostActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 //如果是打开状态就关闭，如果是关闭就打开
+
                 ap_state=!ap_state;
-                boolean setApReturn = setWifiApEnabled(ap_state);
+                Boolean setApReturn = setWifiApEnabled(ap_state);
+                Log.i("setWifiApEnabled : ", setApReturn.toString());
                 if (!ap_state && wifi_state && setApReturn) {//判断是否要重新连接wifi
                     wifiManager.setWifiEnabled(true);
                     wifi_state = false;
                 }
+
                 //Button标签切换
                 if(ap_state) {
                     mWirelessButton.setText(R.string.close_wireless_text);
