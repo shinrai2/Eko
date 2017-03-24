@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Eko</string>
     <string name="host_tips">Host Clicked.</string>
-    <string name="host_text">Host is Here.</string>
+    <string name="music_name">Music Name</string>
     <string name="open_wireless_text">Turn on</string>
     <string name="close_wireless_text">Turn off</string>
     <string name="guest">Guest</string>

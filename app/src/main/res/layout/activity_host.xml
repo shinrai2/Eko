@@ -14,8 +14,10 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/host_text"
-        android:id="@+id/textView"
+        android:text="@string/music_name"
+        android:id="@+id/musicName"
+        android:textSize="18sp"
+        android:layout_marginBottom="@dimen/activity_vertical_margin"
         android:layout_gravity="center_horizontal"
         />
 
@@ -26,7 +28,6 @@
         android:layout_height="0dp"
         android:layout_weight="13"
         android:clickable="true"
-        android:id="@+id/view"
         >
 
         <ImageView
@@ -40,6 +41,14 @@
             android:contentDescription="@string/music_cover"/>
 
     </android.support.percent.PercentRelativeLayout>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:max="100"
+        android:progress="0"/>
 
     <RelativeLayout
         android:orientation="horizontal"

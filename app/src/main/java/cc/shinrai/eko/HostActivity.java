@@ -2,12 +2,8 @@ package cc.shinrai.eko;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.net.DhcpInfo;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,19 +13,13 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import java.lang.reflect.Method;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 
 public class HostActivity extends AppCompatActivity {
     private Button mWirelessButton;
     private Button mSendButton;
     private ImageView mMusicCover;
-//    private SharedPreferences sp;
-//    private SharedPreferences.Editor spe;
-//    private Intent hostServiceIntent = null;    //HostService
     private WifiManager wifiManager;
     private boolean ap_state;                   //记录AP状态
-//    private boolean wifi_state = false;         //记录开启AP前wifi状态
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,13 +27,9 @@ public class HostActivity extends AppCompatActivity {
         getSupportActionBar().hide();
         setContentView(R.layout.activity_host);
 
-//        sp = getPreferences(MODE_PRIVATE);
-//        spe = sp.edit();
-
         wifiManager = (WifiManager)getApplicationContext()
                 .getSystemService(Context.WIFI_SERVICE);
         mMusicCover = (ImageView)findViewById(R.id.musicCover);
-//        mMusicCover.setImageDrawable(getResources().getDrawable(R.drawable.music_cover));
         mWirelessButton = (Button)findViewById(R.id.wireless_button);
         mSendButton = (Button)findViewById(R.id.sned_button);
         if(isWifiApEnabled()) {
@@ -76,9 +62,6 @@ public class HostActivity extends AppCompatActivity {
 
                 if (!ap_state  && setApReturn && wifi_state) {           //判断是否要重新连接wifi
                     wifiManager.setWifiEnabled(true);
-//                    wifi_state = false;
-//                    spe.putBoolean(WIFI_TAG, false);
-//                    spe.commit();
                     getRec().setWifi_state(false);
                 }
 
@@ -116,9 +99,6 @@ public class HostActivity extends AppCompatActivity {
     public boolean setWifiApEnabled(boolean enabled) {
         if (enabled) { // disable WiFi in any case
             if(wifiManager.getWifiState() == 3) {
-//                wifi_state = true;
-//                spe.putBoolean(WIFI_TAG, true);
-//                spe.commit();
                 getRec().setWifi_state(true);
             }
             //wifi和热点不能同时打开，所以打开热点的时候需要关闭wifi
