@@ -15,6 +15,7 @@ import java.text.SimpleDateFormat;
 public class HostService extends IntentService {
     private static final String TAG = "HostService";
     private UdpServer udpServer = null;
+    private static boolean flag = true; //关闭线程的标记
 
     /**
      * Creates an IntentService.  Invoked by your subclass's constructor.
@@ -33,7 +34,7 @@ public class HostService extends IntentService {
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
         Log.i("Service", "onHandleIntent");
-        while (true) {
+        while (flag) {
             udpServer.sendMessage(new SimpleDateFormat("hh:mm:ss").format(new java.util.Date()));
             try {
                 Thread.sleep(1000);
@@ -44,11 +45,17 @@ public class HostService extends IntentService {
     }
 
     public static Intent newIntent(Context context) {
+        flag = true;
         return new Intent(context, HostService.class);
+    }
+
+    public static void setTag(boolean b) {
+        flag = b;
     }
 
     @Override
     public void onDestroy() {
+        HostService.setTag(false);
         udpServer.closeSocket();
         super.onDestroy();
     }
