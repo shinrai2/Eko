@@ -10,6 +10,7 @@
     <uses-permission android:name="android.permission.WRITE_SETTINGS"/>
     <uses-permission android:name="android.permission.CHANGE_CONFIGURATION"/>
     <application
+        android:name=".RecApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -26,5 +27,4 @@
         </activity>
         <service android:name=".HostService" />
     </application>
-
 </manifest>

@@ -2,6 +2,7 @@ package cc.shinrai.eko;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.DhcpInfo;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
@@ -20,20 +21,24 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 public class HostActivity extends AppCompatActivity {
-
     private Button mWirelessButton;
     private Button mSendButton;
     private ImageView mMusicCover;
-    private Intent hostServiceIntent = null;  //HostService
+//    private SharedPreferences sp;
+//    private SharedPreferences.Editor spe;
+//    private Intent hostServiceIntent = null;    //HostService
     private WifiManager wifiManager;
-    private boolean ap_state;  //记录AP状态
-    private boolean wifi_state = false;  //记录开启AP前wifi状态
+    private boolean ap_state;                   //记录AP状态
+//    private boolean wifi_state = false;         //记录开启AP前wifi状态
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSupportActionBar().hide();
         setContentView(R.layout.activity_host);
+
+//        sp = getPreferences(MODE_PRIVATE);
+//        spe = sp.edit();
 
         wifiManager = (WifiManager)getApplicationContext()
                 .getSystemService(Context.WIFI_SERVICE);
@@ -50,6 +55,13 @@ public class HostActivity extends AppCompatActivity {
             ap_state = false;
         }
 
+        if(getRec().getSendIntent() == null) {
+            mSendButton.setText(R.string.send_it);
+        }
+        else {
+            mSendButton.setText(R.string.stop_send);
+        }
+
         //开启or关闭无线热点
         mWirelessButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -57,11 +69,17 @@ public class HostActivity extends AppCompatActivity {
                 //如果是打开状态就关闭，如果是关闭就打开
 
                 ap_state=!ap_state;
-                Boolean setApReturn = setWifiApEnabled(ap_state);
+                Boolean setApReturn = setWifiApEnabled(ap_state);       //设置AP是否成功
                 Log.i("setWifiApEnabled : ", setApReturn.toString());
-                if (!ap_state && wifi_state && setApReturn) {//判断是否要重新连接wifi
+
+                boolean wifi_state = getRec().getWifi_state();
+
+                if (!ap_state  && setApReturn && wifi_state) {           //判断是否要重新连接wifi
                     wifiManager.setWifiEnabled(true);
-                    wifi_state = false;
+//                    wifi_state = false;
+//                    spe.putBoolean(WIFI_TAG, false);
+//                    spe.commit();
+                    getRec().setWifi_state(false);
                 }
 
                 //Button标签切换
@@ -73,12 +91,23 @@ public class HostActivity extends AppCompatActivity {
                 }
             }
         });
+
         //发送UDP包
         mSendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                hostServiceIntent = HostService.newIntent(HostActivity.this);
-                startService(hostServiceIntent);
+                if (getRec().getSendIntent() == null) {
+                    Intent tmpIntent = HostService.newIntent(HostActivity.this);
+                    getRec().setSendIntent(tmpIntent);
+                    startService(tmpIntent);
+                    mSendButton.setText(R.string.stop_send);
+                }
+                else {
+                    Boolean b = stopService(getRec().getSendIntent());
+                    Log.i("onDestroy", "stopService : " + b.toString());
+                    getRec().setSendIntent(null);
+                    mSendButton.setText(R.string.send_it);
+                }
             }
         });
     }
@@ -86,8 +115,13 @@ public class HostActivity extends AppCompatActivity {
     // wifi热点开关
     public boolean setWifiApEnabled(boolean enabled) {
         if (enabled) { // disable WiFi in any case
+            if(wifiManager.getWifiState() == 3) {
+//                wifi_state = true;
+//                spe.putBoolean(WIFI_TAG, true);
+//                spe.commit();
+                getRec().setWifi_state(true);
+            }
             //wifi和热点不能同时打开，所以打开热点的时候需要关闭wifi
-            if(wifiManager.getWifiState() == 3) wifi_state = true;
             wifiManager.setWifiEnabled(false);
         }
         try {
@@ -143,11 +177,10 @@ public class HostActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-//        udpServer.closeSocket();
-        if(hostServiceIntent != null) {
-            Boolean b = stopService(hostServiceIntent);
-            Log.i("onDestroy", "stopService : " + b.toString());
-        }
         super.onDestroy();
+    }
+
+    public RecApplication getRec() {
+        return ((RecApplication)getApplicationContext());
     }
 }
