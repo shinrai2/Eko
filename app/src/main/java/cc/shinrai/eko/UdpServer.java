@@ -52,6 +52,7 @@ public class UdpServer {
             }
         }).start();
     }
+
     public void closeSocket() {
         mSocket.close();
     }
