@@ -35,7 +35,8 @@ public class HostService extends IntentService {
     protected void onHandleIntent(@Nullable Intent intent) {
         Log.i("Service", "onHandleIntent");
         while (flag) {
-            udpServer.sendMessage(new SimpleDateFormat("hh:mm:ss").format(new java.util.Date()));
+            udpServer.sendMessage(new SimpleDateFormat("hh:mm:ss")
+                    .format(new java.util.Date()));
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {

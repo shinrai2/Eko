@@ -2,6 +2,7 @@ package cc.shinrai.eko;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.DhcpInfo;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.Handler;
@@ -15,13 +16,15 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import java.lang.reflect.Method;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 public class HostActivity extends AppCompatActivity {
 
     private Button mWirelessButton;
     private Button mSendButton;
     private ImageView mMusicCover;
-    private Intent i = null;  //HostService
+    private Intent hostServiceIntent = null;  //HostService
     private WifiManager wifiManager;
     private boolean ap_state;  //记录AP状态
     private boolean wifi_state = false;  //记录开启AP前wifi状态
@@ -47,6 +50,7 @@ public class HostActivity extends AppCompatActivity {
             ap_state = false;
         }
 
+        //开启or关闭无线热点
         mWirelessButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -69,11 +73,12 @@ public class HostActivity extends AppCompatActivity {
                 }
             }
         });
+        //发送UDP包
         mSendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                i = HostService.newIntent(HostActivity.this);
-                startService(i);
+                hostServiceIntent = HostService.newIntent(HostActivity.this);
+                startService(hostServiceIntent);
             }
         });
     }
@@ -139,8 +144,8 @@ public class HostActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
 //        udpServer.closeSocket();
-        if(i != null) {
-            Boolean b = stopService(i);
+        if(hostServiceIntent != null) {
+            Boolean b = stopService(hostServiceIntent);
             Log.i("onDestroy", "stopService : " + b.toString());
         }
         super.onDestroy();
