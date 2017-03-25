@@ -20,7 +20,6 @@ import java.lang.reflect.Method;
 public class HostActivity extends AppCompatActivity {
     private Button mWirelessButton;
     private Button mSendButton;
-    private ImageView mMusicCover;
     private WifiManager wifiManager;
     private boolean ap_state;                   //记录AP状态
     private HostService hostService;
@@ -55,7 +54,6 @@ public class HostActivity extends AppCompatActivity {
 
         wifiManager = (WifiManager)getApplicationContext()
                 .getSystemService(Context.WIFI_SERVICE);
-        mMusicCover = (ImageView)findViewById(R.id.musicCover);
         mWirelessButton = (Button)findViewById(R.id.wireless_button);
         mSendButton = (Button)findViewById(R.id.sned_button);
         if(isWifiApEnabled()) {
