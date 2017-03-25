@@ -8,18 +8,7 @@ import android.content.Intent;
  */
 
 public class RecApplication extends Application {
-    private Intent sendIntent = null;
     private Boolean wifi_state = false;
-
-
-    public Intent getSendIntent() {
-        return sendIntent;
-    }
-
-    public void setSendIntent(Intent sendIntent) {
-        this.sendIntent = sendIntent;
-    }
-
 
     public Boolean getWifi_state() {
         return wifi_state;

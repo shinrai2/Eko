@@ -1,9 +1,12 @@
 package cc.shinrai.eko;
 
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
+import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,12 +23,35 @@ public class HostActivity extends AppCompatActivity {
     private ImageView mMusicCover;
     private WifiManager wifiManager;
     private boolean ap_state;                   //记录AP状态
+    private HostService hostService;
+    private ServiceConnection sc = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            hostService = ((HostService.MyBinder)service).getService();
+            if(hostService.isFlag() == false) {
+                mSendButton.setText(R.string.send_it);
+            }
+            else {
+                mSendButton.setText(R.string.stop_send);
+            }
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            hostService = null;
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSupportActionBar().hide();
         setContentView(R.layout.activity_host);
+
+        Intent tmpIntent = HostService.newIntent(HostActivity.this);
+        startService(tmpIntent);
+        bindService(tmpIntent, sc, HostActivity.BIND_AUTO_CREATE);
 
         wifiManager = (WifiManager)getApplicationContext()
                 .getSystemService(Context.WIFI_SERVICE);
@@ -39,13 +65,6 @@ public class HostActivity extends AppCompatActivity {
         else {
             mWirelessButton.setText(R.string.open_wireless_text);
             ap_state = false;
-        }
-
-        if(getRec().getSendIntent() == null) {
-            mSendButton.setText(R.string.send_it);
-        }
-        else {
-            mSendButton.setText(R.string.stop_send);
         }
 
         //开启or关闭无线热点
@@ -79,17 +98,14 @@ public class HostActivity extends AppCompatActivity {
         mSendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (getRec().getSendIntent() == null) {
-                    Intent tmpIntent = HostService.newIntent(HostActivity.this);
-                    getRec().setSendIntent(tmpIntent);
-                    startService(tmpIntent);
-                    mSendButton.setText(R.string.stop_send);
+                if(hostService.isFlag()) {
+                    hostService.setFlag(false);
+                    mSendButton.setText(R.string.send_it);
                 }
                 else {
-                    Boolean b = stopService(getRec().getSendIntent());
-                    Log.i("onDestroy", "stopService : " + b.toString());
-                    getRec().setSendIntent(null);
-                    mSendButton.setText(R.string.send_it);
+                    hostService.setFlag(true);
+                    hostService.sendMessage();
+                    mSendButton.setText(R.string.stop_send);
                 }
             }
         });
@@ -157,6 +173,7 @@ public class HostActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        unbindService(sc);
         super.onDestroy();
     }
 
