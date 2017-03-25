@@ -15,6 +15,7 @@ import java.text.SimpleDateFormat;
  */
 
 public class HostService extends Service {
+    private static final String TAG = "HostService";
     private UdpServer udpServer = null;
     private boolean flag = false; //发送状态的标记
 
@@ -41,15 +42,15 @@ public class HostService extends Service {
     }
 
     public void sendMessage() {
-        Log.i("HostService", "sendMessage");
+        Log.i(TAG, "sendMessage");
         new Thread(new Runnable() {
             @Override
             public void run() {
-                Log.i("HostService", "before send.");
+                Log.i(TAG, "before send.");
                 while (flag) {
                     udpServer.sendMessage(new SimpleDateFormat("hh:mm:ss")
                             .format(new java.util.Date()));
-                    Log.i("HostService", "send.");
+                    Log.i(TAG, "send.");
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
@@ -67,13 +68,14 @@ public class HostService extends Service {
 
     @Override
     public void onDestroy() {
+        this.flag = false;
         udpServer.closeSocket();
         super.onDestroy();
     }
 
     @Override
     public void onCreate() {
-        Log.i("HostService", "start.");
+        Log.i(TAG, "start.");
         if (udpServer == null)
             udpServer = new UdpServer();
         super.onCreate();
