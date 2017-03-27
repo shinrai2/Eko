@@ -22,21 +22,22 @@ import java.lang.reflect.Method;
 
 public class HostActivity extends AppCompatActivity {
     private Button mWirelessButton;
-    private Button mSendButton;
+    private Button mPlayButton;
     private Button mFileButton;
     private WifiManager wifiManager;
     private boolean ap_state;                   //记录AP状态
     private HostService hostService;
-    private ServiceConnection sc = new ServiceConnection() {
 
+    //ServiceConnection
+    private ServiceConnection sc = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             hostService = ((HostService.MyBinder)service).getService();
             if(hostService.isFlag() == false) {
-                mSendButton.setText(R.string.send_it);
+                mPlayButton.setText(R.string.play);
             }
             else {
-                mSendButton.setText(R.string.stop_send);
+                mPlayButton.setText(R.string.stop);
             }
         }
 
@@ -59,7 +60,7 @@ public class HostActivity extends AppCompatActivity {
         wifiManager = (WifiManager)getApplicationContext()
                 .getSystemService(Context.WIFI_SERVICE);
         mWirelessButton = (Button)findViewById(R.id.wireless_button);
-        mSendButton = (Button)findViewById(R.id.sned_button);
+        mPlayButton = (Button)findViewById(R.id.play_button);
         mFileButton = (Button)findViewById(R.id.file_button);
         if(isWifiApEnabled()) {
             mWirelessButton.setText(R.string.close_wireless_text);
@@ -98,26 +99,28 @@ public class HostActivity extends AppCompatActivity {
         });
 
         //发送UDP包
-        mSendButton.setOnClickListener(new View.OnClickListener() {
+        mPlayButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(hostService.isFlag()) {
                     hostService.setFlag(false);
-                    mSendButton.setText(R.string.send_it);
+                    hostService.stop();
+                    mPlayButton.setText(R.string.play);
                 }
                 else {
                     hostService.setFlag(true);
-                    hostService.sendMessage();
-                    mSendButton.setText(R.string.stop_send);
+//                    hostService.sendMessage();
+                    hostService.play();
+                    mPlayButton.setText(R.string.stop);
                 }
             }
         });
 
-        //Decode Test
+        //File
         mFileButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                
+
             }
         });
 

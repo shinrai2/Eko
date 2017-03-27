@@ -7,7 +7,7 @@
     <string name="guest">Guest</string>
     <string name="host">Host</string>
     <string name="music_cover">Music Cover</string>
-    <string name="send_it">Send it</string>
-    <string name="stop_send">Stop ..</string>
+    <string name="play">Play</string>
+    <string name="stop">Stop</string>
     <string name="file">File</string>
 </resources>

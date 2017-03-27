@@ -40,8 +40,6 @@ public class UdpServer {
             mSocket.setNetworkInterface(getWlanEth());
 //            224.0.0.1为广播地址
             InetAddress address = InetAddress.getByName("224.0.0.1");
-//            这个地方可以输出判断该地址是不是广播类型的地址
-//            System.out.println(address.isMulticastAddress());
             dataPacket = new DatagramPacket(data, data.length, address,
                     8004);
         } catch (Exception e) {
