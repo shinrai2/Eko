@@ -76,6 +76,15 @@
             android:layout_toRightOf="@+id/wireless_button"
             android:layout_toEndOf="@+id/wireless_button"/>
 
+        <Button
+            android:id="@+id/file_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/file"
+            android:layout_alignParentBottom="true"
+            android:layout_toRightOf="@+id/sned_button"
+            android:layout_toEndOf="@+id/sned_button"/>
+
     </RelativeLayout>
 
 </LinearLayout>

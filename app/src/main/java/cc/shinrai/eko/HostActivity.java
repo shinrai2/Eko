@@ -4,8 +4,10 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.media.MediaFormat;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
+import android.os.Environment;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -15,11 +17,13 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 
 public class HostActivity extends AppCompatActivity {
     private Button mWirelessButton;
     private Button mSendButton;
+    private Button mFileButton;
     private WifiManager wifiManager;
     private boolean ap_state;                   //记录AP状态
     private HostService hostService;
@@ -56,6 +60,7 @@ public class HostActivity extends AppCompatActivity {
                 .getSystemService(Context.WIFI_SERVICE);
         mWirelessButton = (Button)findViewById(R.id.wireless_button);
         mSendButton = (Button)findViewById(R.id.sned_button);
+        mFileButton = (Button)findViewById(R.id.file_button);
         if(isWifiApEnabled()) {
             mWirelessButton.setText(R.string.close_wireless_text);
             ap_state = true;
@@ -107,6 +112,15 @@ public class HostActivity extends AppCompatActivity {
                 }
             }
         });
+
+        //Decode Test
+        mFileButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                
+            }
+        });
+
     }
 
     // wifi热点开关

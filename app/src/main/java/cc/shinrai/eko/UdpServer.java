@@ -38,12 +38,10 @@ public class UdpServer {
         try {
             mSocket.setTimeToLive(4);
             mSocket.setNetworkInterface(getWlanEth());
-            //将本机的IP（这里可以写动态获取的IP）地址放到数据包里，其实server端接收到数据包后也能获取到发包方的IP的
-//            byte[] data = msg.getBytes();
-            //224.0.0.1为广播地址
+//            224.0.0.1为广播地址
             InetAddress address = InetAddress.getByName("224.0.0.1");
-            //这个地方可以输出判断该地址是不是广播类型的地址
-            System.out.println(address.isMulticastAddress());
+//            这个地方可以输出判断该地址是不是广播类型的地址
+//            System.out.println(address.isMulticastAddress());
             dataPacket = new DatagramPacket(data, data.length, address,
                     8004);
         } catch (Exception e) {
