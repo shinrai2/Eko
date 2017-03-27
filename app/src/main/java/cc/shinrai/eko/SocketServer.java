@@ -4,7 +4,9 @@ import android.os.Environment;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.ExecutorService;
@@ -50,10 +52,19 @@ public class SocketServer {
         public void run() {
             try {
                 InputStream inputStream = new FileInputStream(path);
-            } catch (FileNotFoundException e) {
+                OutputStream outputStream = socket.getOutputStream();
+                byte buffer[] = new byte[4 * 1024];
+                int temp = 0;
+                while ((temp = inputStream.read(buffer)) != -1) {
+                    // 把数据写入到OuputStream对象中
+                    outputStream.write(buffer, 0, temp);
+                }
+                // 发送读取的数据到服务端
+                outputStream.flush();
+            } catch (Exception e) {
                 e.printStackTrace();
             }
-            
+
         }
     }
 

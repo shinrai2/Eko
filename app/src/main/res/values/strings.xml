@@ -8,6 +8,6 @@
     <string name="host">Host</string>
     <string name="music_cover">Music Cover</string>
     <string name="play">Play</string>
-    <string name="stop">Stop</string>
+    <string name="pause">Pause</string>
     <string name="file">File</string>
 </resources>

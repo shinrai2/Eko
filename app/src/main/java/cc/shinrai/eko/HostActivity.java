@@ -37,7 +37,7 @@ public class HostActivity extends AppCompatActivity {
                 mPlayButton.setText(R.string.play);
             }
             else {
-                mPlayButton.setText(R.string.stop);
+                mPlayButton.setText(R.string.pause);
             }
         }
 
@@ -104,14 +104,14 @@ public class HostActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if(hostService.isFlag()) {
                     hostService.setFlag(false);
-                    hostService.stop();
+                    hostService.pause();
                     mPlayButton.setText(R.string.play);
                 }
                 else {
                     hostService.setFlag(true);
 //                    hostService.sendMessage();
-                    hostService.play();
-                    mPlayButton.setText(R.string.stop);
+                    hostService.play(0);
+                    mPlayButton.setText(R.string.pause);
                 }
             }
         });
