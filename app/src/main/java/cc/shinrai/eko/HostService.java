@@ -66,22 +66,13 @@ public class HostService extends Service {
 //        }).start();
 //    }
 
-    public void pause() {
-        if (mediaPlayer != null && mediaPlayer.isPlaying()) {
-            mediaPlayer.pause();
-            isPause = true;
-        }
-    }
 
-    public void play(int position) {
-        try {
-            mediaPlayer.reset();//把各项参数恢复到初始状态
-            mediaPlayer.setDataSource(path);
-            mediaPlayer.prepare();  //进行缓冲
-            mediaPlayer.setOnPreparedListener(new PreparedListener(position));//注册一个监听器
+    public void play(boolean play) {
+        if(play) {
+            mediaPlayer.start();
         }
-        catch (Exception e) {
-            e.printStackTrace();
+        else {
+            mediaPlayer.pause();
         }
     }
 
@@ -102,6 +93,16 @@ public class HostService extends Service {
         Log.i(TAG, "start.");
 //        if (udpServer == null)
 //            udpServer = new UdpServer();
+        try {
+            mediaPlayer.reset();//把各项参数恢复到初始状态
+            mediaPlayer.setDataSource(path);
+            mediaPlayer.prepare();  //进行缓冲
+//            mediaPlayer.set
+//            mediaPlayer.setOnPreparedListener(new PreparedListener(0));//注册一个监听器
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
         super.onCreate();
     }
 
@@ -119,5 +120,6 @@ public class HostService extends Service {
                 mediaPlayer.seekTo(positon);
             }
         }
+
     }
 }

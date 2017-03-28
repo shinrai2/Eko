@@ -103,14 +103,14 @@ public class HostActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if(hostService.isFlag()) {
-                    hostService.setFlag(false);
-                    hostService.pause();
+                    hostService.setFlag(false);//按钮及启用代码状态标记
+                    hostService.play(false);
                     mPlayButton.setText(R.string.play);
                 }
                 else {
                     hostService.setFlag(true);
 //                    hostService.sendMessage();
-                    hostService.play(0);
+                    hostService.play(true);
                     mPlayButton.setText(R.string.pause);
                 }
             }

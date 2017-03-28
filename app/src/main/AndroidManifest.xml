@@ -12,6 +12,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"/>
+
     <application
         android:name=".RecApplication"
         android:allowBackup="true"
@@ -28,6 +29,11 @@
         </activity>
         <activity android:name=".HostActivity">
         </activity>
-        <service android:name=".HostService" />
+
+        <service android:name=".HostService"/>
+
+        <activity android:name=".MusicListActivity">
+        </activity>
     </application>
+
 </manifest>
