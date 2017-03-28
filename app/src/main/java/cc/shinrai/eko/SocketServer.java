@@ -51,7 +51,12 @@ public class SocketServer {
 
         @Override
         public void run() {
-            try {
+            sendData(socket);
+        }
+    }
+
+    private void sendData(Socket socket) {
+        try {
 //                InputStream inputStream = socket.getInputStream();
 //                byte buffer[] = new byte[1024 * 4];
 //                int temp = 0;
@@ -60,22 +65,20 @@ public class SocketServer {
 //                    Log.i(TAG, new String(buffer, 0, temp));
 //                }
 
-                InputStream fileinputStream = new FileInputStream(path);
-                OutputStream outputStream = socket.getOutputStream();
-                byte writebuffer[] = new byte[4 * 1024];
-                int wtemp = 0;
-                while ((wtemp = fileinputStream.read(writebuffer)) != -1) {
-                    // 把数据写入到OuputStream对象中
-                    outputStream.write(writebuffer, 0, wtemp);
-                }
-                // 发送读取的数据到服务端
-                outputStream.flush();
+            InputStream fileinputStream = new FileInputStream(path);
+            OutputStream outputStream = socket.getOutputStream();
+            byte writebuffer[] = new byte[4 * 1024];
+            int wtemp = 0;
+            while ((wtemp = fileinputStream.read(writebuffer)) != -1) {
+                // 把数据写入到OuputStream对象中
+                outputStream.write(writebuffer, 0, wtemp);
+            }
+            // 发送读取的数据到服务端
+            outputStream.flush();
 
                 socket.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
