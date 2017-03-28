@@ -10,8 +10,11 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.util.List;
+
 public class MusicListActivity extends AppCompatActivity {
     private RecyclerView mMusicRecyclerView;
+    private MusicAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,6 +25,13 @@ public class MusicListActivity extends AppCompatActivity {
         mMusicRecyclerView = (RecyclerView)findViewById(R.id.music_recycler_view);
         mMusicRecyclerView.setLayoutManager(
                 new LinearLayoutManager(MusicListActivity.this));
+    }
+
+    private void updateUI() {
+        MusicLab musicLab = MusicLab.get(MusicListActivity.this);
+        List<MusicInfo> musicInfoList = musicLab.getMusicInfo();
+        mAdapter = new MusicAdapter(musicInfoList);
+        mMusicRecyclerView.setAdapter(mAdapter);
     }
 
     private class MusicHolder extends RecyclerView.ViewHolder {
@@ -39,6 +49,11 @@ public class MusicListActivity extends AppCompatActivity {
     }
 
     private class MusicAdapter extends RecyclerView.Adapter<MusicHolder> {
+        private List<MusicInfo> mMusicInfoList;
+
+        public MusicAdapter(List<MusicInfo> musicInfoList) {
+            mMusicInfoList = musicInfoList;
+        }
 
         @Override
         public MusicHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -50,12 +65,15 @@ public class MusicListActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(MusicHolder holder, int position) {
-
+            MusicInfo musicInfo = mMusicInfoList.get(position);
+            holder.mMusicNameTextView.setText(musicInfo.getMusicName());
+            holder.mSingerNameTextView.setText(musicInfo.getSingerName());
+            holder.mMusicTimeTextView.setText(musicInfo.getMusicTime());
         }
 
         @Override
         public int getItemCount() {
-            return 0;
+            return mMusicInfoList.size();
         }
     }
 }
