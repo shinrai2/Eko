@@ -18,6 +18,7 @@ import java.text.SimpleDateFormat;
 
 public class HostService extends Service {
     private static final String TAG = "HostService";
+    private SocketServer mSocketServer;
 //    private UdpServer udpServer = null;
     private MediaPlayer mediaPlayer =  new MediaPlayer();
     private boolean isPause;    //暂停状态
@@ -91,6 +92,17 @@ public class HostService extends Service {
     @Override
     public void onCreate() {
         Log.i(TAG, "start.");
+        mSocketServer = new SocketServer(9999);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    mSocketServer.start();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
 //        if (udpServer == null)
 //            udpServer = new UdpServer();
         try {

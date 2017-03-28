@@ -1,10 +1,9 @@
 package cc.shinrai.eko;
 
 import android.os.Environment;
+import android.util.Log;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
@@ -17,7 +16,7 @@ import java.util.concurrent.Executors;
  */
 
 public class SocketServer {
-
+    private static final String TAG = "SocketServer";
     private int port;// 监听端口
     private ExecutorService executorService;// 线程池
     private boolean quit;// 是否退出
@@ -26,6 +25,7 @@ public class SocketServer {
 
     public SocketServer(int port) {
         this.port = port;
+        quit = false;
         // 初始化线程池
         executorService = Executors.newFixedThreadPool(Runtime.getRuntime()
                 .availableProcessors() * 50);
@@ -37,6 +37,7 @@ public class SocketServer {
         while (!quit) {
             Socket socket = ss.accept();// 接受客户端的请求
             // 为支持多用户并发访问，采用线程池管理每一个用户的连接请求
+            Log.i(TAG, "A device connect.");
             executorService.execute(new SocketTask(socket));// 启动一个线程来处理请求
         }
     }
@@ -51,16 +52,26 @@ public class SocketServer {
         @Override
         public void run() {
             try {
-                InputStream inputStream = new FileInputStream(path);
+//                InputStream inputStream = socket.getInputStream();
+//                byte buffer[] = new byte[1024 * 4];
+//                int temp = 0;
+//                // 从InputStream当中读取客户端所发送的数据
+//                while ((temp = inputStream.read(buffer)) != -1) {
+//                    Log.i(TAG, new String(buffer, 0, temp));
+//                }
+
+                InputStream fileinputStream = new FileInputStream(path);
                 OutputStream outputStream = socket.getOutputStream();
-                byte buffer[] = new byte[4 * 1024];
-                int temp = 0;
-                while ((temp = inputStream.read(buffer)) != -1) {
+                byte writebuffer[] = new byte[4 * 1024];
+                int wtemp = 0;
+                while ((wtemp = fileinputStream.read(writebuffer)) != -1) {
                     // 把数据写入到OuputStream对象中
-                    outputStream.write(buffer, 0, temp);
+                    outputStream.write(writebuffer, 0, wtemp);
                 }
                 // 发送读取的数据到服务端
                 outputStream.flush();
+
+                socket.close();
             } catch (Exception e) {
                 e.printStackTrace();
             }
