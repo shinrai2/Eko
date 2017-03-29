@@ -25,11 +25,12 @@ public class MusicListActivity extends AppCompatActivity {
         mMusicRecyclerView = (RecyclerView)findViewById(R.id.music_recycler_view);
         mMusicRecyclerView.setLayoutManager(
                 new LinearLayoutManager(MusicListActivity.this));
+        updateUI();
     }
 
     private void updateUI() {
         MusicLab musicLab = MusicLab.get(MusicListActivity.this);
-        List<MusicInfo> musicInfoList = musicLab.getMusicInfo();
+        List<MusicInfo> musicInfoList = musicLab.getMusicInfos();
         mAdapter = new MusicAdapter(musicInfoList);
         mMusicRecyclerView.setAdapter(mAdapter);
     }
@@ -68,7 +69,7 @@ public class MusicListActivity extends AppCompatActivity {
             MusicInfo musicInfo = mMusicInfoList.get(position);
             holder.mMusicNameTextView.setText(musicInfo.getMusicName());
             holder.mSingerNameTextView.setText(musicInfo.getSingerName());
-            holder.mMusicTimeTextView.setText(musicInfo.getMusicTime());
+            holder.mMusicTimeTextView.setText(musicInfo.getDurationTime());
         }
 
         @Override

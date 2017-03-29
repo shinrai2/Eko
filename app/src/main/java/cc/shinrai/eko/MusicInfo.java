@@ -7,7 +7,7 @@ package cc.shinrai.eko;
 public class MusicInfo {
     private String mMusicName;
     private String mSingerName;
-    private String mMusicTime;
+    private String mDurationTime;
     private String mPath;
 
     public String getMusicName() {
@@ -24,11 +24,11 @@ public class MusicInfo {
         mSingerName = singerName;
     }
 
-    public String getMusicTime() {
-        return mMusicTime;
+    public String getDurationTime() {
+        return mDurationTime;
     }
-    public void setMusicTime(String musicTime) {
-        mMusicTime = musicTime;
+    public void setDurationTime(String durationTime) {
+        mDurationTime = durationTime;
     }
 
     public String getPath() {
