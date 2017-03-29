@@ -70,9 +70,6 @@ public class MusicLab {
                 mMusicInfoList.add(musicInfo);
             }
         }
-
-        //刷新UI
-
     }
 
     //从数据库中查询音乐数据
@@ -89,12 +86,7 @@ public class MusicLab {
         }
         if (mMusicInfoList.isEmpty()) {
             Log.i(TAG, "update");
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    update();
-                }
-            }).start();
+            update();
         }
     }
 

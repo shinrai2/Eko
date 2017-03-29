@@ -1,5 +1,7 @@
 package cc.shinrai.eko;
 
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -13,8 +15,11 @@ import android.widget.TextView;
 import java.util.List;
 
 public class MusicListActivity extends AppCompatActivity {
+    public static final int RECYCLERVIEW_REFLESH = 1;
     private RecyclerView mMusicRecyclerView;
     private MusicAdapter mAdapter;
+    private List<MusicInfo> musicInfoList;
+    private Handler mUIHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,12 +30,34 @@ public class MusicListActivity extends AppCompatActivity {
         mMusicRecyclerView = (RecyclerView)findViewById(R.id.music_recycler_view);
         mMusicRecyclerView.setLayoutManager(
                 new LinearLayoutManager(MusicListActivity.this));
-        updateUI();
+
+        mUIHandler = new Handler() {
+
+            public void handleMessage(Message msg) {
+                switch (msg.what) {
+                    case RECYCLERVIEW_REFLESH:
+                        updateUI();
+                        break;
+                    default:
+                        break;
+                }
+            }
+        };
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                MusicLab musicLab = MusicLab.get(MusicListActivity.this);
+                musicInfoList = musicLab.getMusicInfos();
+                Message message = new Message();
+                message.what = RECYCLERVIEW_REFLESH;
+                mUIHandler.sendMessage(message);
+            }
+        }).start();
     }
 
+
     protected void updateUI() {
-        MusicLab musicLab = MusicLab.get(MusicListActivity.this);
-        List<MusicInfo> musicInfoList = musicLab.getMusicInfos();
         mAdapter = new MusicAdapter(musicInfoList);
         mMusicRecyclerView.setAdapter(mAdapter);
         mMusicRecyclerView.addItemDecoration(new RecycleViewDivider(MusicListActivity.this, LinearLayoutManager.HORIZONTAL));
