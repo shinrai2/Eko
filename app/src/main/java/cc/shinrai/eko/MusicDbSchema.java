@@ -12,6 +12,7 @@ public class MusicDbSchema {
             public static final String MUSIC_NAME = "music_name";
             public static final String SINGER_NAME = "singer_name";
             public static final String DURATION_TIME = "duration_time";
+            public static final String PATH = "path";
         }
     }
 }

@@ -9,28 +9,28 @@ public class MusicInfo {
     private String mSingerName;
     private String mDurationTime;
     private String mPath;
-
+    //音乐名
     public String getMusicName() {
         return mMusicName;
     }
     public void setMusicName(String musicName) {
         mMusicName = musicName;
     }
-
+    //歌手名
     public String getSingerName() {
         return mSingerName;
     }
     public void setSingerName(String singerName) {
         mSingerName = singerName;
     }
-
+    //音乐时长
     public String getDurationTime() {
         return mDurationTime;
     }
     public void setDurationTime(String durationTime) {
         mDurationTime = durationTime;
     }
-
+    //路径
     public String getPath() {
         return mPath;
     }

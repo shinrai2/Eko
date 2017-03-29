@@ -30,7 +30,9 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this,
                         R.string.host_tips,
                         Toast.LENGTH_SHORT).show();
-                Intent i = new Intent(MainActivity.this, HostActivity.class);
+
+                //启动音乐列表Activity
+                Intent i = new Intent(MainActivity.this, MusicListActivity.class);
                 startActivity(i);
             }
         });

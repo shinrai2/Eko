@@ -24,7 +24,8 @@ public class MusicBaseHelper extends SQLiteOpenHelper {
             " _id integer primary key autoincrement, " +
             MusicTable.Cols.MUSIC_NAME + ", " +
             MusicTable.Cols.SINGER_NAME + ", " +
-            MusicTable.Cols.DURATION_TIME +
+            MusicTable.Cols.DURATION_TIME + ", " +
+            MusicTable.Cols.PATH +
             ")"
         );
     }

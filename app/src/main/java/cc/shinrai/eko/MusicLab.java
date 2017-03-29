@@ -2,8 +2,10 @@ package cc.shinrai.eko;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.media.MediaMetadataRetriever;
+import android.util.Log;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -16,11 +18,12 @@ import cc.shinrai.eko.MusicDbSchema.MusicTable;
  */
 
 public class MusicLab {
+    private static final String TAG = "MusicLab";
     private static MusicLab sMusicLab;
     private List<MusicInfo> mMusicInfoList;
     private Context mContext;
     private SQLiteDatabase mDatabase;
-    private String basePath = "/storage/sdcard1/netease/cloudmusic/";
+    private String basePath = "/storage/sdcard1/netease/cloudmusic/Music/";
 
     private MusicLab(Context context) {
         //从数据库中读取数据
@@ -28,6 +31,7 @@ public class MusicLab {
         mDatabase = new MusicBaseHelper(mContext)
                 .getWritableDatabase();
         mMusicInfoList = new ArrayList<>();
+        Log.i(TAG, "query");
         query();
     }
 
@@ -44,10 +48,13 @@ public class MusicLab {
 
     //刷新音乐数据并记录到数据库中
     public void update() {
+        //先进行数据库清空操作
         clean();
+
         File[] files = new File(basePath).listFiles();
         MediaMetadataRetriever mmr = new MediaMetadataRetriever();
         for(File file : files) {
+            Log.i(TAG, file.getPath());
             if(file.getName().matches(".*\\.mp3$")) {
                 String path = file.getPath();
                 mmr.setDataSource(path);
@@ -67,7 +74,20 @@ public class MusicLab {
 
     //从数据库中查询音乐数据
     public void query() {
+        Cursor cursor = mDatabase.rawQuery("SELECT * FROM " + MusicTable.NAME, null);
+        while (cursor.moveToNext()) {
+            MusicInfo musicInfo = new MusicInfo();
+            musicInfo.setMusicName(cursor.getString(cursor.getColumnIndex(MusicTable.Cols.MUSIC_NAME)));
+            musicInfo.setSingerName(cursor.getString(cursor.getColumnIndex(MusicTable.Cols.SINGER_NAME)));
+            musicInfo.setDurationTime(cursor.getString(cursor.getColumnIndex(MusicTable.Cols.DURATION_TIME)));
+            musicInfo.setPath(cursor.getString(cursor.getColumnIndex(MusicTable.Cols.PATH)));
 
+            mMusicInfoList.add(musicInfo);
+        }
+        if (mMusicInfoList.isEmpty()) {
+            Log.i(TAG, "update");
+            update();
+        }
     }
 
     private static ContentValues getContentValues(MusicInfo musicInfo) {
@@ -75,10 +95,12 @@ public class MusicLab {
         values.put(MusicTable.Cols.MUSIC_NAME, musicInfo.getMusicName());
         values.put(MusicTable.Cols.SINGER_NAME, musicInfo.getSingerName());
         values.put(MusicTable.Cols.DURATION_TIME, musicInfo.getDurationTime());
+        values.put(MusicTable.Cols.PATH, musicInfo.getPath());
 
         return values;
     }
 
+    //加入项目到数据库
     public void addMusicInfo(MusicInfo musicInfo) {
         ContentValues values = getContentValues(musicInfo);
 
