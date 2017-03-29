@@ -28,12 +28,15 @@ public class MusicListActivity extends AppCompatActivity {
         updateUI();
     }
 
-    private void updateUI() {
+    protected void updateUI() {
         MusicLab musicLab = MusicLab.get(MusicListActivity.this);
         List<MusicInfo> musicInfoList = musicLab.getMusicInfos();
         mAdapter = new MusicAdapter(musicInfoList);
         mMusicRecyclerView.setAdapter(mAdapter);
+        mMusicRecyclerView.addItemDecoration(new RecycleViewDivider(MusicListActivity.this, LinearLayoutManager.HORIZONTAL));
     }
+
+
 
     private class MusicHolder extends RecyclerView.ViewHolder {
         private TextView mMusicNameTextView;
