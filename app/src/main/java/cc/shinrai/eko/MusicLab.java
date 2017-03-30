@@ -61,6 +61,8 @@ public class MusicLab {
                 String music_name = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
                 String singer_name = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
                 String duration_time = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+                if(music_name == null) music_name = "unknown";
+                if(singer_name == null) singer_name = "unknown";
                 MusicInfo musicInfo = new MusicInfo();
                 musicInfo.setMusicName(music_name);
                 musicInfo.setSingerName(singer_name);
