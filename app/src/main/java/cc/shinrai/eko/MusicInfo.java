@@ -1,10 +1,12 @@
 package cc.shinrai.eko;
 
+import java.io.Serializable;
+
 /**
  * Created by Shinrai on 2017/3/28 0028.
  */
 
-public class MusicInfo {
+public class MusicInfo implements Serializable {
     private String mMusicName;
     private String mSingerName;
     private String mDurationTime;
@@ -36,5 +38,16 @@ public class MusicInfo {
     }
     public void setPath(String path) {
         mPath = path;
+    }
+
+    public boolean equals_(MusicInfo mi) {
+        if(mi != null) {
+            if (this.getMusicName().equals(mi.getMusicName()) &&
+                    this.getSingerName().equals(mi.getSingerName()) &&
+                    this.getDurationTime().equals(mi.getDurationTime())) {
+                return true;
+            }
+        }
+        return false;
     }
 }

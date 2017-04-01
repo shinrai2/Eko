@@ -15,9 +15,19 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/music_name"
-        android:id="@+id/musicName"
+        android:id="@+id/musicTitle"
         android:textSize="18sp"
-        android:layout_marginBottom="@dimen/activity_vertical_margin"
+        android:layout_margin="@dimen/default_margin"
+        android:layout_gravity="center_horizontal"
+        />
+
+    <TextView
+        android:id="@+id/singerName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/singer_name"
+        android:textSize="12sp"
+        android:layout_margin="@dimen/default_margin"
         android:layout_gravity="center_horizontal"
         />
 

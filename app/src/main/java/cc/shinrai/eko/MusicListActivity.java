@@ -1,5 +1,6 @@
 package cc.shinrai.eko;
 
+import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
@@ -65,10 +66,18 @@ public class MusicListActivity extends AppCompatActivity {
 
 
 
-    private class MusicHolder extends RecyclerView.ViewHolder {
+    private class MusicHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private TextView mMusicNameTextView;
         private TextView mSingerNameTextView;
         private TextView mMusicTimeTextView;
+        private MusicInfo mMusicInfo;
+
+        public void bindMusic (MusicInfo musicInfo) {
+            mMusicInfo = musicInfo;
+            mMusicNameTextView.setText(mMusicInfo.getMusicName());
+            mSingerNameTextView.setText(mMusicInfo.getSingerName());
+            mMusicTimeTextView.setText(mMusicInfo.getDurationTime());
+        }
 
         public MusicHolder(View itemView) {
             super(itemView);
@@ -76,6 +85,14 @@ public class MusicListActivity extends AppCompatActivity {
             mMusicNameTextView = (TextView)itemView.findViewById(R.id.music_name);
             mSingerNameTextView = (TextView)itemView.findViewById(R.id.singer_name);
             mMusicTimeTextView = (TextView)itemView.findViewById(R.id.music_time);
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            Intent i = new Intent(MusicListActivity.this, HostActivity.class);
+            i.putExtra("music_info", mMusicInfo);
+            startActivity(i);
         }
     }
 
@@ -97,9 +114,7 @@ public class MusicListActivity extends AppCompatActivity {
         @Override
         public void onBindViewHolder(MusicHolder holder, int position) {
             MusicInfo musicInfo = mMusicInfoList.get(position);
-            holder.mMusicNameTextView.setText(musicInfo.getMusicName());
-            holder.mSingerNameTextView.setText(musicInfo.getSingerName());
-            holder.mMusicTimeTextView.setText(musicInfo.getDurationTime());
+            holder.bindMusic(musicInfo);
         }
 
         @Override

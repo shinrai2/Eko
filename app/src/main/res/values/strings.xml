@@ -10,4 +10,6 @@
     <string name="play">Play</string>
     <string name="pause">Pause</string>
     <string name="file">File</string>
+    <string name="singer_name">Singer Name</string>
+    <string name="music_title">Music Title</string>
 </resources>

@@ -1,5 +1,7 @@
 package cc.shinrai.eko;
 
+import android.app.Service;
+import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
 
@@ -21,7 +23,11 @@ public class SocketServer {
     private ExecutorService executorService;// 线程池
     private boolean quit;// 是否退出
     private ServerSocket ss = null;
-    private String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/1.mp3";
+    private String path;
+
+    public void setPath(String p) {
+        path = p;
+    }
 
     public SocketServer(int port) {
         this.port = port;
@@ -30,6 +36,7 @@ public class SocketServer {
         executorService = Executors.newFixedThreadPool(Runtime.getRuntime()
                 .availableProcessors() * 50);
     }
+
 
     // 启动服务
     public void start() throws Exception {
@@ -76,7 +83,7 @@ public class SocketServer {
             // 发送读取的数据到服务端
             outputStream.flush();
 
-                socket.close();
+            socket.close();
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -21,9 +21,10 @@ public class HostService extends Service {
     private SocketServer mSocketServer;
 //    private UdpServer udpServer = null;
     private MediaPlayer mediaPlayer =  new MediaPlayer();
-    private boolean isPause;    //暂停状态
-    private String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/1.mp3";
-    private boolean flag = false; //发送状态的标记
+//    private boolean isPause;    //暂停状态
+//    private String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/1.mp3";
+    private boolean flag = false; //播放状态的标记
+    private MusicInfo mMusicInfo;
 
     public boolean isFlag() {
         return flag;
@@ -67,7 +68,6 @@ public class HostService extends Service {
 //        }).start();
 //    }
 
-
     public void play(boolean play) {
         if(play) {
             mediaPlayer.start();
@@ -92,6 +92,13 @@ public class HostService extends Service {
     @Override
     public void onCreate() {
         Log.i(TAG, "start.");
+        onSocketStart();
+//        if (udpServer == null)
+//            udpServer = new UdpServer();
+        super.onCreate();
+    }
+
+    public void onSocketStart() {
         mSocketServer = new SocketServer(9999);
         new Thread(new Runnable() {
             @Override
@@ -103,35 +110,41 @@ public class HostService extends Service {
                 }
             }
         }).start();
-//        if (udpServer == null)
-//            udpServer = new UdpServer();
-        try {
-            mediaPlayer.reset();//把各项参数恢复到初始状态
-            mediaPlayer.setDataSource(path);
-            mediaPlayer.prepare();  //进行缓冲
+    }
+
+    public void prepare(MusicInfo musicInfo) {
+        //musicInfo 和 mMusicInfo 位置不能调换
+        if(musicInfo.equals_(mMusicInfo) == false) {
+            mMusicInfo = musicInfo;
+            mSocketServer.setPath(mMusicInfo.getPath());
+            //设置发送文件的路径
+            try {
+                mediaPlayer.reset();//把各项参数恢复到初始状态
+                mediaPlayer.setDataSource(musicInfo.getPath());
+                mediaPlayer.prepare();  //进行缓冲
+                flag = false;
 //            mediaPlayer.set
 //            mediaPlayer.setOnPreparedListener(new PreparedListener(0));//注册一个监听器
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-        super.onCreate();
-    }
-
-    private class PreparedListener implements MediaPlayer.OnPreparedListener {
-        private int positon;
-
-        public PreparedListener(int p0) {
-            positon = p0;
-        }
-
-        @Override
-        public void onPrepared(MediaPlayer mp) {
-            mediaPlayer.start();    //开始播放
-            if(positon > 0) {    //如果音乐不是从头播放
-                mediaPlayer.seekTo(positon);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
-
     }
+
+//    private class PreparedListener implements MediaPlayer.OnPreparedListener {
+//        private int positon;
+//
+//        public PreparedListener(int p0) {
+//            positon = p0;
+//        }
+//
+//        @Override
+//        public void onPrepared(MediaPlayer mp) {
+//            mediaPlayer.start();    //开始播放
+//            if(positon > 0) {    //如果音乐不是从头播放
+//                mediaPlayer.seekTo(positon);
+//            }
+//        }
+//
+//    }
 }

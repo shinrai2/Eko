@@ -15,24 +15,32 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
 
 public class HostActivity extends AppCompatActivity {
+    public static final String TAG = "HostActivity";
     private Button mWirelessButton;
     private Button mPlayButton;
     private Button mFileButton;
+    private TextView mMusicName;
+    private TextView mSingerName;
     private WifiManager wifiManager;
     private boolean ap_state;                   //记录AP状态
     private HostService hostService;
+    private MusicInfo mMusicInfo;
 
     //ServiceConnection
     private ServiceConnection sc = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             hostService = ((HostService.MyBinder)service).getService();
+            hostService.prepare(mMusicInfo);
             if(hostService.isFlag() == false) {
                 mPlayButton.setText(R.string.play);
             }
@@ -53,15 +61,30 @@ public class HostActivity extends AppCompatActivity {
         getSupportActionBar().hide();
         setContentView(R.layout.activity_host);
 
+        //获取intent传来的music对象
+        mMusicInfo = (MusicInfo) getIntent().getSerializableExtra("music_info");
+        Log.i(TAG, mMusicInfo.getMusicName() + " - " +
+            mMusicInfo.getSingerName() + " - " +
+            mMusicInfo.getDurationTime());
+
+        //启动后台服务
         Intent tmpIntent = HostService.newIntent(HostActivity.this);
         startService(tmpIntent);
         bindService(tmpIntent, sc, HostActivity.BIND_AUTO_CREATE);
 
+        //初始化wifi管理、按钮
         wifiManager = (WifiManager)getApplicationContext()
                 .getSystemService(Context.WIFI_SERVICE);
         mWirelessButton = (Button)findViewById(R.id.wireless_button);
         mPlayButton = (Button)findViewById(R.id.play_button);
         mFileButton = (Button)findViewById(R.id.file_button);
+        mMusicName = (TextView)findViewById(R.id.musicTitle);
+        mSingerName = (TextView)findViewById(R.id.singerName);
+
+        mMusicName.setText(mMusicInfo.getMusicName());
+        mSingerName.setText(mMusicInfo.getSingerName());
+
+        //判断ap是否已经开启
         if(isWifiApEnabled()) {
             mWirelessButton.setText(R.string.close_wireless_text);
             ap_state = true;

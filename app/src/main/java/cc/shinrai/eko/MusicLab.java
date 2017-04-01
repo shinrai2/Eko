@@ -50,7 +50,7 @@ public class MusicLab {
     }
 
     //刷新音乐数据并记录到数据库中
-    public void update() throws Exception {
+    public void update() {
         //先进行数据库清空操作
         clean();
 
@@ -95,11 +95,7 @@ public class MusicLab {
         }
         if (mMusicInfoList.isEmpty()) {
             Log.i(TAG, "update");
-            try {
-                update();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            update();
         }
     }
 
