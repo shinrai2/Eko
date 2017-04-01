@@ -2,16 +2,19 @@ package cc.shinrai.eko;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.res.AssetFileDescriptor;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.media.MediaMetadataRetriever;
 import android.util.Log;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import cc.shinrai.eko.MusicDbSchema.MusicTable;
+import wseemann.media.FFmpegMediaMetadataRetriever;
 
 /**
  * Created by Shinrai on 2017/3/29 0029.
@@ -47,20 +50,24 @@ public class MusicLab {
     }
 
     //刷新音乐数据并记录到数据库中
-    public void update() {
+    public void update() throws Exception {
         //先进行数据库清空操作
         clean();
 
         File[] files = new File(basePath).listFiles();
-        MediaMetadataRetriever mmr = new MediaMetadataRetriever();
+        FFmpegMediaMetadataRetriever fmmr = new FFmpegMediaMetadataRetriever();
         for(File file : files) {
             Log.i(TAG, file.getPath());
             if(file.getName().matches(".*\\.mp3$")) {
                 String path = file.getPath();
-                mmr.setDataSource(path);
-                String music_name = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
-                String singer_name = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
-                String duration_time = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+//                Log.i(TAG, path);
+                fmmr.setDataSource(path);
+                String music_name = fmmr.extractMetadata(
+                        FFmpegMediaMetadataRetriever.METADATA_KEY_TITLE);
+                String singer_name = fmmr.extractMetadata(
+                        FFmpegMediaMetadataRetriever.METADATA_KEY_ARTIST);
+                String duration_time = fmmr.extractMetadata(
+                        FFmpegMediaMetadataRetriever.METADATA_KEY_DURATION);
                 if(music_name == null) music_name = "unknown";
                 if(singer_name == null) singer_name = "unknown";
                 MusicInfo musicInfo = new MusicInfo();
@@ -88,7 +95,11 @@ public class MusicLab {
         }
         if (mMusicInfoList.isEmpty()) {
             Log.i(TAG, "update");
-            update();
+            try {
+                update();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 

@@ -27,4 +27,5 @@ dependencies {
     compile 'com.android.support.constraint:constraint-layout:+'
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:recyclerview-v7:25.3.0'
+    compile 'com.github.wseemann:FFmpegMediaMetadataRetriever:1.0.9'
 }
