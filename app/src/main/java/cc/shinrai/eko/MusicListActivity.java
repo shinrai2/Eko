@@ -18,8 +18,10 @@ import java.util.List;
 public class MusicListActivity extends AppCompatActivity {
     public static final int RECYCLERVIEW_REFLESH = 1;
     private RecyclerView mMusicRecyclerView;
+    private TextView mMusicTitleOnBar;
     private MusicAdapter mAdapter;
     private List<MusicInfo> musicInfoList;
+    private MusicInfo currentMusic;
     private Handler mUIHandler;
 
     @Override
@@ -29,6 +31,9 @@ public class MusicListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_music_list);
 
         mMusicRecyclerView = (RecyclerView)findViewById(R.id.music_recycler_view);
+        mMusicTitleOnBar = (TextView)findViewById(R.id.musicTitleOnBar);
+        setBar();
+
         mMusicRecyclerView.setLayoutManager(
                 new LinearLayoutManager(MusicListActivity.this));
 
@@ -57,6 +62,11 @@ public class MusicListActivity extends AppCompatActivity {
         }).start();
     }
 
+    private void setBar() {
+        if(currentMusic != null) {
+            mMusicTitleOnBar.setText(currentMusic.getMusicName());
+        }
+    }
 
     protected void updateUI() {
         mAdapter = new MusicAdapter(musicInfoList);
@@ -90,6 +100,8 @@ public class MusicListActivity extends AppCompatActivity {
 
         @Override
         public void onClick(View v) {
+            currentMusic = mMusicInfo;
+            setBar();
             Intent i = new Intent(MusicListActivity.this, HostActivity.class);
             i.putExtra("music_info", mMusicInfo);
             startActivity(i);
