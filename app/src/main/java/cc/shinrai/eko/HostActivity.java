@@ -50,7 +50,7 @@ public class HostActivity extends AppCompatActivity {
                 mMusicName.setText(mMusicInfo.getMusicName());
                 mSingerName.setText(mMusicInfo.getSingerName());
             }
-            if(hostService.isFlag() == false) {
+            if(hostService.isPlaying() == false) {
                 mPlayButton.setText(R.string.play);
             }
             else {
@@ -76,16 +76,6 @@ public class HostActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         getSupportActionBar().hide();
         setContentView(R.layout.activity_host);
-
-//        Intent tmpi = getIntent();
-//        //判断是否携带音乐信息
-//        if(tmpi.hasExtra("music_info")) {
-//            //获取intent传来的music对象
-//            mMusicInfo = (MusicInfo) tmpi.getSerializableExtra("music_info");
-//            Log.i(TAG, mMusicInfo.getMusicName() + " - " +
-//                    mMusicInfo.getSingerName() + " - " +
-//                    mMusicInfo.getDurationTime());
-//        }
 
         //初始化wifi管理、各种操作的按钮
         wifiManager = (WifiManager)getApplicationContext()
@@ -138,14 +128,13 @@ public class HostActivity extends AppCompatActivity {
         mPlayButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(hostService.isFlag()) {
-                    hostService.setFlag(false);//按钮及启用代码状态标记
+                if(hostService.isPlaying()) {
+//                    hostService.setFlag(false);//按钮及启用代码状态标记
                     hostService.play(false);
                     mPlayButton.setText(R.string.play);
                 }
                 else {
-                    hostService.setFlag(true);
-//                    hostService.sendMessage();
+//                    hostService.setFlag(true);
                     hostService.play(true);
                     mPlayButton.setText(R.string.pause);
                 }

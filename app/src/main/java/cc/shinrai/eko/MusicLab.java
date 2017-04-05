@@ -1,9 +1,12 @@
 package cc.shinrai.eko;
 
+import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 
 import java.io.File;
@@ -24,10 +27,12 @@ public class MusicLab {
     private Context mContext;
     private SQLiteDatabase mDatabase;
     private String basePath = "/storage/sdcard1/netease/cloudmusic/Music/";
+    private Handler mHandler;
 
-    private MusicLab(Context context) {
+    private MusicLab(Context context, Handler handler) {
         //从数据库中读取数据
         mContext = context;
+        mHandler = handler;
         mDatabase = new MusicBaseHelper(mContext)
                 .getWritableDatabase();
         mMusicInfoList = new ArrayList<>();
@@ -35,9 +40,9 @@ public class MusicLab {
         query();
     }
 
-    public static MusicLab get(Context context) {
+    public static MusicLab get(Context context, Handler handler) {
         if(sMusicLab == null) {
-            sMusicLab = new MusicLab(context);
+            sMusicLab = new MusicLab(context, handler);
         }
         return sMusicLab;
     }
@@ -75,6 +80,10 @@ public class MusicLab {
                 musicInfo.setPath(path);
                 addMusicInfo(musicInfo);
                 mMusicInfoList.add(musicInfo);
+                Message message = new Message();
+                message.what = MusicListActivity.MUSIC_LIST_UPDATE_REFLESH;
+                message.obj = "Add music : \n" + music_name + " - " + singer_name + " ..";
+                mHandler.sendMessage(message);
             }
         }
     }

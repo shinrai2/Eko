@@ -29,6 +29,10 @@ public class SocketServer {
         path = p;
     }
 
+    public void stopSocket() {
+        quit = true;
+    }
+
     public SocketServer(int port) {
         this.port = port;
         quit = false;

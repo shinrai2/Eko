@@ -32,7 +32,7 @@ public class UdpServer {
         sendData(msg.getBytes());
     }
 
-    public void sendData(byte[] data) {
+    private void sendData(byte[] data) {
         Log.i("udp","before send.");
 
         try {

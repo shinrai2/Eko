@@ -13,6 +13,7 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import wseemann.media.FFmpegMediaMetadataRetriever;
 
@@ -23,11 +24,9 @@ import wseemann.media.FFmpegMediaMetadataRetriever;
 public class HostService extends Service {
     private static final String TAG = "HostService";
     private SocketServer mSocketServer;
-//    private UdpServer udpServer = null;
+    private UdpServer udpServer;
     private MediaPlayer mediaPlayer =  new MediaPlayer();
-//    private boolean isPause;    //暂停状态
-//    private String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/1.mp3";
-    private boolean flag = false; //播放状态的标记
+    private boolean flag = true; //udp标记
     private MusicInfo mMusicInfo;
     private Bitmap mBitmap;
 
@@ -39,13 +38,13 @@ public class HostService extends Service {
         return mMusicInfo;
     }
 
-    public boolean isFlag() {
-        return flag;
-    }
-
-    public void setFlag(boolean flag) {
-        this.flag = flag;
-    }
+//    public boolean isFlag() {
+//        return flag;
+//    }
+//
+//    public void setFlag(boolean flag) {
+//        this.flag = flag;
+//    }
 
     public final IBinder binder = new MyBinder();
 
@@ -61,25 +60,25 @@ public class HostService extends Service {
         return binder;
     }
 
-//    public void sendMessage() {
-//        Log.i(TAG, "sendMessage");
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                Log.i(TAG, "before send.");
-//                while (flag) {
-//                    udpServer.sendMessage(new SimpleDateFormat("hh:mm:ss")
-//                            .format(new java.util.Date()));
-//                    Log.i(TAG, "send.");
-//                    try {
-//                        Thread.sleep(1000);
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//            }
-//        }).start();
-//    }
+    public void sendMessage() {
+        Log.i(TAG, "sendMessage");
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Log.i(TAG, "before send.");
+                while (true) {
+                    udpServer.sendMessage(((Boolean)mediaPlayer.isPlaying()).toString() + "-" +
+                            mediaPlayer.getCurrentPosition() + "-" + new Date().getTime());
+                    Log.i(TAG, "send.");
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }).start();
+    }
 
     public void play(boolean play) {
         if(play) {
@@ -90,6 +89,9 @@ public class HostService extends Service {
         }
     }
 
+    public boolean isPlaying() {
+        return mediaPlayer.isPlaying();
+    }
 
     public static Intent newIntent(Context context) {
         return new Intent(context, HostService.class);
@@ -98,7 +100,8 @@ public class HostService extends Service {
     @Override
     public void onDestroy() {
         this.flag = false;
-//        udpServer.closeSocket();
+        udpServer.closeSocket();
+        mSocketServer.stopSocket();
         super.onDestroy();
     }
 
@@ -106,12 +109,14 @@ public class HostService extends Service {
     public void onCreate() {
         Log.i(TAG, "start.");
         onSocketStart();
-//        if (udpServer == null)
-//            udpServer = new UdpServer();
         super.onCreate();
     }
 
     public void onSocketStart() {
+        //udp启动
+        udpServer = new UdpServer();
+        sendMessage();
+        //tcp启动
         mSocketServer = new SocketServer(9999);
         new Thread(new Runnable() {
             @Override
@@ -136,8 +141,6 @@ public class HostService extends Service {
                 mediaPlayer.setDataSource(musicInfo.getPath());
                 mediaPlayer.prepare();  //进行缓冲
                 flag = false;
-//            mediaPlayer.set
-//            mediaPlayer.setOnPreparedListener(new PreparedListener(0));//注册一个监听器
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -152,21 +155,4 @@ public class HostService extends Service {
             }
         }
     }
-
-//    private class PreparedListener implements MediaPlayer.OnPreparedListener {
-//        private int positon;
-//
-//        public PreparedListener(int p0) {
-//            positon = p0;
-//        }
-//
-//        @Override
-//        public void onPrepared(MediaPlayer mp) {
-//            mediaPlayer.start();    //开始播放
-//            if(positon > 0) {    //如果音乐不是从头播放
-//                mediaPlayer.seekTo(positon);
-//            }
-//        }
-//
-//    }
 }

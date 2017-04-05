@@ -1,5 +1,6 @@
 package cc.shinrai.eko;
 
+import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
@@ -16,13 +17,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.List;
 
 public class MusicListActivity extends AppCompatActivity {
     public static final int RECYCLERVIEW_REFLESH = 1;
+    public static final int MUSIC_LIST_UPDATE_REFLESH = 2;
     private RecyclerView mMusicRecyclerView;
     private TextView mMusicTitleOnBar;
     private PercentRelativeLayout mPercentRelativeLayout;
@@ -31,6 +32,7 @@ public class MusicListActivity extends AppCompatActivity {
     private Handler mUIHandler;
     private MusicInfo mMusicInfo;
     private ImageView mPicView;
+    private ProgressDialog mProgressDialog;
 
     private HostService hostService;
     //ServiceConnection
@@ -70,14 +72,19 @@ public class MusicListActivity extends AppCompatActivity {
         mMusicRecyclerView.setLayoutManager(
                 new LinearLayoutManager(MusicListActivity.this));
 
+        mProgressDialog = ProgressDialog.show(MusicListActivity.this, "Loading..", "Please wait..", true, false);
+
         //通过handler进行更新UI的操作
         mUIHandler = new Handler() {
 
             public void handleMessage(Message msg) {
                 switch (msg.what) {
                     case RECYCLERVIEW_REFLESH:
+                        mProgressDialog.dismiss();
                         updateUI();
                         break;
+                    case MUSIC_LIST_UPDATE_REFLESH:
+                        mProgressDialog.setMessage((String)msg.obj);
                     default:
                         break;
                 }
@@ -87,7 +94,7 @@ public class MusicListActivity extends AppCompatActivity {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                MusicLab musicLab = MusicLab.get(MusicListActivity.this);
+                MusicLab musicLab = MusicLab.get(MusicListActivity.this, mUIHandler);
                 musicInfoList = musicLab.getMusicInfos();
                 Message message = new Message();
                 message.what = RECYCLERVIEW_REFLESH;
@@ -129,6 +136,7 @@ public class MusicListActivity extends AppCompatActivity {
         }
     }
 
+    //更新UI操作
     protected void updateUI() {
         mAdapter = new MusicAdapter(musicInfoList);
         mMusicRecyclerView.setAdapter(mAdapter);
@@ -167,7 +175,6 @@ public class MusicListActivity extends AppCompatActivity {
             }
             setBar(musicInfo);
             Intent i = new Intent(MusicListActivity.this, HostActivity.class);
-//            i.putExtra("music_info", musicInfo);
             startActivity(i);
         }
     }
