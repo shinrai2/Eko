@@ -2,14 +2,11 @@ package cc.shinrai.eko;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.res.AssetFileDescriptor;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.media.MediaMetadataRetriever;
 import android.util.Log;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -68,6 +65,7 @@ public class MusicLab {
                         FFmpegMediaMetadataRetriever.METADATA_KEY_ARTIST);
                 String duration_time = fmmr.extractMetadata(
                         FFmpegMediaMetadataRetriever.METADATA_KEY_DURATION);
+
                 if(music_name == null) music_name = "unknown";
                 if(singer_name == null) singer_name = "unknown";
                 MusicInfo musicInfo = new MusicInfo();

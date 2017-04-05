@@ -17,23 +17,25 @@
         />
 
     <android.support.percent.PercentRelativeLayout
+        android:id="@+id/bottomBar"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:background="@color/light_gray"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:visibility="gone">
 
         <ImageView
             android:id="@+id/musicPic"
-            android:layout_height="0dp"
             android:layout_width="0dp"
-            app:layout_heightPercent="100%"
-            app:layout_aspectRatio="100%"
+            android:layout_height="0dp"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            app:srcCompat="@mipmap/ic_launcher"
             android:contentDescription=""
+            app:layout_aspectRatio="100%"
+            app:layout_heightPercent="100%"
+            app:srcCompat="@mipmap/ic_launcher"
             tools:ignore="ContentDescription"/>
 
         <TextView
@@ -43,13 +45,13 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
-            android:text="@string/music_title"
-            android:textSize="20sp"
-            android:lines="1"
-            android:ellipsize="marquee"
             android:layout_margin="@dimen/default_margin"
             android:layout_toLeftOf="@+id/musicPic"
-            android:layout_toStartOf="@+id/musicPic"/>
+            android:layout_toStartOf="@+id/musicPic"
+            android:ellipsize="marquee"
+            android:lines="1"
+            android:text="@string/music_title"
+            android:textSize="20sp"/>
 
 
     </android.support.percent.PercentRelativeLayout>

@@ -3,6 +3,8 @@ package cc.shinrai.eko;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.MediaPlayer;
 import android.os.Binder;
 import android.os.Environment;
@@ -11,6 +13,8 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import java.text.SimpleDateFormat;
+
+import wseemann.media.FFmpegMediaMetadataRetriever;
 
 /**
  * Created by Shinrai on 2017/3/22 0022.
@@ -25,6 +29,15 @@ public class HostService extends Service {
 //    private String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/1.mp3";
     private boolean flag = false; //播放状态的标记
     private MusicInfo mMusicInfo;
+    private Bitmap mBitmap;
+
+    public Bitmap getBitmap() {
+        return mBitmap;
+    }
+
+    public MusicInfo getMusicInfo() {
+        return mMusicInfo;
+    }
 
     public boolean isFlag() {
         return flag;
@@ -127,6 +140,15 @@ public class HostService extends Service {
 //            mediaPlayer.setOnPreparedListener(new PreparedListener(0));//注册一个监听器
             } catch (Exception e) {
                 e.printStackTrace();
+            }
+            FFmpegMediaMetadataRetriever fmmr = new FFmpegMediaMetadataRetriever();
+            fmmr.setDataSource(mMusicInfo.getPath());
+            byte[] cover_data = fmmr.getEmbeddedPicture();
+            if(cover_data != null) {
+                mBitmap = BitmapFactory.decodeByteArray(cover_data, 0, cover_data.length);
+            }
+            else {
+                mBitmap = null;
             }
         }
     }

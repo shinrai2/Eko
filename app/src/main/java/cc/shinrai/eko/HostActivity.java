@@ -4,6 +4,8 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.graphics.Bitmap;
+import android.media.Image;
 import android.media.MediaFormat;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
@@ -30,6 +32,7 @@ public class HostActivity extends AppCompatActivity {
     private Button mFileButton;
     private TextView mMusicName;
     private TextView mSingerName;
+    private ImageView mCoverView;
     private WifiManager wifiManager;
     private boolean ap_state;                   //记录AP状态
     private HostService hostService;
@@ -40,12 +43,25 @@ public class HostActivity extends AppCompatActivity {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             hostService = ((HostService.MyBinder)service).getService();
-            hostService.prepare(mMusicInfo);
+            mMusicInfo = hostService.getMusicInfo();
+
+            //刷新UI
+            if(mMusicInfo != null) {
+                mMusicName.setText(mMusicInfo.getMusicName());
+                mSingerName.setText(mMusicInfo.getSingerName());
+            }
             if(hostService.isFlag() == false) {
                 mPlayButton.setText(R.string.play);
             }
             else {
                 mPlayButton.setText(R.string.pause);
+            }
+            Bitmap bitmap = hostService.getBitmap();
+            if(bitmap != null) {
+                mCoverView.setImageBitmap(bitmap);
+            }
+            else {
+                mCoverView.setImageResource(R.drawable.e);
             }
         }
 
@@ -61,18 +77,17 @@ public class HostActivity extends AppCompatActivity {
         getSupportActionBar().hide();
         setContentView(R.layout.activity_host);
 
-        //获取intent传来的music对象
-        mMusicInfo = (MusicInfo) getIntent().getSerializableExtra("music_info");
-        Log.i(TAG, mMusicInfo.getMusicName() + " - " +
-            mMusicInfo.getSingerName() + " - " +
-            mMusicInfo.getDurationTime());
+//        Intent tmpi = getIntent();
+//        //判断是否携带音乐信息
+//        if(tmpi.hasExtra("music_info")) {
+//            //获取intent传来的music对象
+//            mMusicInfo = (MusicInfo) tmpi.getSerializableExtra("music_info");
+//            Log.i(TAG, mMusicInfo.getMusicName() + " - " +
+//                    mMusicInfo.getSingerName() + " - " +
+//                    mMusicInfo.getDurationTime());
+//        }
 
-        //启动后台服务
-        Intent tmpIntent = HostService.newIntent(HostActivity.this);
-        startService(tmpIntent);
-        bindService(tmpIntent, sc, HostActivity.BIND_AUTO_CREATE);
-
-        //初始化wifi管理、按钮
+        //初始化wifi管理、各种操作的按钮
         wifiManager = (WifiManager)getApplicationContext()
                 .getSystemService(Context.WIFI_SERVICE);
         mWirelessButton = (Button)findViewById(R.id.wireless_button);
@@ -80,9 +95,7 @@ public class HostActivity extends AppCompatActivity {
         mFileButton = (Button)findViewById(R.id.file_button);
         mMusicName = (TextView)findViewById(R.id.musicTitle);
         mSingerName = (TextView)findViewById(R.id.singerName);
-
-        mMusicName.setText(mMusicInfo.getMusicName());
-        mSingerName.setText(mMusicInfo.getSingerName());
+        mCoverView = (ImageView)findViewById(R.id.musicCover);
 
         //判断ap是否已经开启
         if(isWifiApEnabled()) {
@@ -121,7 +134,7 @@ public class HostActivity extends AppCompatActivity {
             }
         });
 
-        //发送UDP包
+        //播放/暂停音乐
         mPlayButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -139,7 +152,7 @@ public class HostActivity extends AppCompatActivity {
             }
         });
 
-        //File
+        //File预留按钮、待编辑
         mFileButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -210,9 +223,19 @@ public class HostActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onDestroy() {
+    protected void onStart() {
+        //启动后台服务
+        Intent tmpIntent = HostService.newIntent(HostActivity.this);
+        startService(tmpIntent);
+        bindService(tmpIntent, sc, HostActivity.BIND_AUTO_CREATE);
+
+        super.onStart();
+    }
+
+    @Override
+    protected void onStop() {
         unbindService(sc);
-        super.onDestroy();
+        super.onStop();
     }
 
     public RecApplication getRec() {

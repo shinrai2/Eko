@@ -1,5 +1,6 @@
 package cc.shinrai.eko;
 
+
 import java.io.Serializable;
 
 /**
@@ -11,6 +12,7 @@ public class MusicInfo implements Serializable {
     private String mSingerName;
     private String mDurationTime;
     private String mPath;
+
     //音乐名
     public String getMusicName() {
         return mMusicName;
