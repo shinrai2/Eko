@@ -1,8 +1,11 @@
 package cc.shinrai.eko;
 
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.Bitmap;
 import android.os.Handler;
@@ -13,6 +16,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +28,7 @@ import java.util.List;
 public class MusicListActivity extends AppCompatActivity {
     public static final int RECYCLERVIEW_REFLESH = 1;
     public static final int MUSIC_LIST_UPDATE_REFLESH = 2;
+    private static final String TAG = "MusicListActivity";
     private RecyclerView mMusicRecyclerView;
     private TextView mMusicTitleOnBar;
     private PercentRelativeLayout mPercentRelativeLayout;
@@ -33,6 +38,7 @@ public class MusicListActivity extends AppCompatActivity {
     private MusicInfo mMusicInfo;
     private ImageView mPicView;
     private ProgressDialog mProgressDialog;
+    private ContentReceiver mReceiver;
 
     private HostService hostService;
     //ServiceConnection
@@ -40,7 +46,6 @@ public class MusicListActivity extends AppCompatActivity {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             hostService = ((HostService.MyBinder)service).getService();
-            mMusicInfo = hostService.getMusicInfo();
             setBar(mMusicInfo);
         }
 
@@ -53,7 +58,7 @@ public class MusicListActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getSupportActionBar().hide();
+//        getSupportActionBar().hide();
         setContentView(R.layout.activity_music_list);
 
         mMusicRecyclerView = (RecyclerView)findViewById(R.id.music_recycler_view);
@@ -80,10 +85,12 @@ public class MusicListActivity extends AppCompatActivity {
             public void handleMessage(Message msg) {
                 switch (msg.what) {
                     case RECYCLERVIEW_REFLESH:
+                        //ProgressDialog消失，刷新列表
                         mProgressDialog.dismiss();
                         updateUI();
                         break;
                     case MUSIC_LIST_UPDATE_REFLESH:
+                        //刷新ProgressDialog上面的文本显示
                         mProgressDialog.setMessage((String)msg.obj);
                     default:
                         break;
@@ -101,6 +108,11 @@ public class MusicListActivity extends AppCompatActivity {
                 mUIHandler.sendMessage(message);
             }
         }).start();
+
+        mReceiver=new ContentReceiver();
+        IntentFilter filter = new IntentFilter(
+                HostService.UIREFRESH_PRIVATE);
+        registerReceiver(mReceiver, filter);
     }
 
     @Override
@@ -119,6 +131,8 @@ public class MusicListActivity extends AppCompatActivity {
     }
 
     private void setBar(MusicInfo musicInfo) {
+        //更新音乐信息
+        mMusicInfo = hostService.getMusicInfo();
         //栏的textview内容更改和栏的可视操作
         Bitmap bitmap = hostService.getBitmap();
         if(bitmap != null) {
@@ -136,7 +150,7 @@ public class MusicListActivity extends AppCompatActivity {
         }
     }
 
-    //更新UI操作
+    //更新列表的UI操作
     protected void updateUI() {
         mAdapter = new MusicAdapter(musicInfoList);
         mMusicRecyclerView.setAdapter(mAdapter);
@@ -158,6 +172,12 @@ public class MusicListActivity extends AppCompatActivity {
             mMusicTimeTextView.setText(musicInfo.getDurationTime());
         }
 
+        //格式化音乐时长的字符串成便于人阅读的时间字符串
+        private String formatDurationTime(String durationTime) {
+            int tmpint = Integer.parseInt(durationTime);
+            
+        }
+
         public MusicHolder(View itemView) {
             super(itemView);
 
@@ -173,7 +193,7 @@ public class MusicListActivity extends AppCompatActivity {
             if(mMusicInfo != null) {
                 hostService.prepare(mMusicInfo);
             }
-            setBar(musicInfo);
+//            setBar(musicInfo);
             Intent i = new Intent(MusicListActivity.this, HostActivity.class);
             startActivity(i);
         }
@@ -204,5 +224,21 @@ public class MusicListActivity extends AppCompatActivity {
         public int getItemCount() {
             return mMusicInfoList.size();
         }
+    }
+
+    private class ContentReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.i(TAG, "ContentReceiver");
+            setBar(mMusicInfo);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (mReceiver!=null) {
+            unregisterReceiver(mReceiver);
+        }
+        super.onDestroy();
     }
 }

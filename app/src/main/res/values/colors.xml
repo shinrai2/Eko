@@ -4,5 +4,5 @@
     <!--<color name="colorPrimaryDark">#303F9F</color>-->
     <color name="colorPrimaryDiy">#009688</color>
     <color name="colorAccent">#FF4081</color>
-    <color name="light_gray">#F5F5F5</color>
+    <color name="bar_background">#F5F5F5</color>
 </resources>

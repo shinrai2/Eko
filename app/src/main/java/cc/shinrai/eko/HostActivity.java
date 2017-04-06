@@ -1,8 +1,11 @@
 package cc.shinrai.eko;
 
+import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.Bitmap;
 import android.media.Image;
@@ -10,13 +13,16 @@ import android.media.MediaFormat;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.Environment;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,46 +31,35 @@ import org.w3c.dom.Text;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Timer;
+import java.util.TimerTask;
 
 public class HostActivity extends AppCompatActivity {
     public static final String TAG = "HostActivity";
+    public static final int TIMER_REFRESH = 7;
     private Button mWirelessButton;
     private Button mPlayButton;
     private Button mFileButton;
     private TextView mMusicName;
     private TextView mSingerName;
+    private ProgressBar mProgressBar;
     private ImageView mCoverView;
     private WifiManager wifiManager;
     private boolean ap_state;                   //记录AP状态
     private HostService hostService;
     private MusicInfo mMusicInfo;
-    private Timer mTimer;
+    private ContentReceiver mReceiver; //获取应用内广播的receiver
+    private Timer mTimer; //音乐进度条的timer
+    private TimerTask mTimerTask; //上述timer对应的timertask
+    private Handler mTimerHandler; //更改进度条位置的handler
 
-    //ServiceConnection
+    //Service绑定后回调
     private ServiceConnection sc = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             hostService = ((HostService.MyBinder)service).getService();
-            mMusicInfo = hostService.getMusicInfo();
-
+            mTimer.schedule(mTimerTask, 0, 50);
             //刷新UI
-            if(mMusicInfo != null) {
-                mMusicName.setText(mMusicInfo.getMusicName());
-                mSingerName.setText(mMusicInfo.getSingerName());
-            }
-            if(hostService.isPlaying() == false) {
-                mPlayButton.setText(R.string.play);
-            }
-            else {
-                mPlayButton.setText(R.string.pause);
-            }
-            Bitmap bitmap = hostService.getBitmap();
-            if(bitmap != null) {
-                mCoverView.setImageBitmap(bitmap);
-            }
-            else {
-                mCoverView.setImageResource(R.drawable.default_cover);
-            }
+            UIrefresh();
         }
 
         @Override
@@ -72,6 +67,30 @@ public class HostActivity extends AppCompatActivity {
             hostService = null;
         }
     };
+
+    //刷新UI界面
+    private void UIrefresh() {
+        mMusicInfo = hostService.getMusicInfo();
+        if(mMusicInfo != null) {
+            mMusicName.setText(mMusicInfo.getMusicName());
+            mSingerName.setText(mMusicInfo.getSingerName());
+            mProgressBar.setMax(Integer.parseInt(mMusicInfo.getDurationTime()));
+        }
+        if(hostService.isPlaying() == false) {
+            mPlayButton.setText(R.string.play);
+        }
+        else {
+            mPlayButton.setText(R.string.pause);
+
+        }
+        Bitmap bitmap = hostService.getBitmap();
+        if(bitmap != null) {
+            mCoverView.setImageBitmap(bitmap);
+        }
+        else {
+            mCoverView.setImageResource(R.drawable.default_cover);
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,6 +107,28 @@ public class HostActivity extends AppCompatActivity {
         mMusicName = (TextView)findViewById(R.id.musicTitle);
         mSingerName = (TextView)findViewById(R.id.singerName);
         mCoverView = (ImageView)findViewById(R.id.musicCover);
+        mProgressBar = (ProgressBar)findViewById(R.id.progressBar);
+        mTimer = new Timer();
+        mTimerHandler = new Handler() {
+
+            public void handleMessage(Message msg) {
+                switch (msg.what) {
+                    case TIMER_REFRESH:
+                        mProgressBar.setProgress(hostService.getCurrentPosition());
+                        break;
+                    default:
+                        break;
+                }
+            }
+        };
+        mTimerTask = new TimerTask() {
+            @Override
+            public void run() {
+                Message msg = new Message();
+                msg.what = TIMER_REFRESH;
+                mTimerHandler.sendMessage(msg);
+            }
+        };
 
         //判断ap是否已经开启
         if(isWifiApEnabled()) {
@@ -151,6 +192,10 @@ public class HostActivity extends AppCompatActivity {
             }
         });
 
+        mReceiver=new ContentReceiver();
+        IntentFilter filter = new IntentFilter(
+                HostService.UIREFRESH_PRIVATE);
+        registerReceiver(mReceiver, filter);
     }
 
     // wifi热点开关
@@ -229,7 +274,29 @@ public class HostActivity extends AppCompatActivity {
         super.onStop();
     }
 
+    @Override
+    protected void onDestroy() {
+        if (mReceiver != null) {
+            unregisterReceiver(mReceiver);
+        }
+        if(mTimerTask != null) {
+            mTimerTask.cancel();
+        }
+        if(mTimer != null) {
+            mTimer.cancel();
+        }
+        super.onDestroy();
+    }
+
     public RecApplication getRec() {
         return ((RecApplication)getApplicationContext());
+    }
+
+    private class ContentReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.i(TAG, "ContentReceiver");
+            UIrefresh();
+        }
     }
 }

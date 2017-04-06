@@ -27,9 +27,6 @@ public class MainActivity extends AppCompatActivity {
         mHostButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(MainActivity.this,
-                        R.string.host_tips,
-                        Toast.LENGTH_SHORT).show();
 
                 //启动音乐列表Activity
                 Intent i = new Intent(MainActivity.this, MusicListActivity.class);
@@ -53,7 +50,6 @@ public class MainActivity extends AppCompatActivity {
                             while (true) {
                                 try {
                                     ds.receive(dp);
-                                    //Toast.makeText(this, new String(buf, 0, dp.getLength()), Toast.LENGTH_LONG);
                                     Log.i("Receive Time", new String(buf, 0, dp.getLength()));
 //			                break;
                                 } catch (Exception e) {

@@ -14,8 +14,14 @@ import android.os.Message;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.zip.CRC32;
+import java.util.zip.CheckedInputStream;
 
 import wseemann.media.FFmpegMediaMetadataRetriever;
 
@@ -25,12 +31,11 @@ import wseemann.media.FFmpegMediaMetadataRetriever;
 
 public class HostService extends Service {
     public static final int SEND_MESSAGE = 9;
-
+    public static final String UIREFRESH_PRIVATE = "cc.shinrai.eko.UIREFRESH_PRIVATE";
     private static final String TAG = "HostService";
     private SocketServer mSocketServer;
     private UdpServer udpServer;
     private MediaPlayer mediaPlayer =  new MediaPlayer();
-    private boolean flag = true; //udp标记
     private MusicInfo mMusicInfo;
     private Bitmap mBitmap;
     private Handler mHandler;//在tcp发送歌曲完毕后的handler
@@ -42,14 +47,6 @@ public class HostService extends Service {
     public MusicInfo getMusicInfo() {
         return mMusicInfo;
     }
-
-//    public boolean isFlag() {
-//        return flag;
-//    }
-//
-//    public void setFlag(boolean flag) {
-//        this.flag = flag;
-//    }
 
     public final IBinder binder = new MyBinder();
 
@@ -71,8 +68,9 @@ public class HostService extends Service {
             @Override
             public void run() {
                 Log.i(TAG, "before send.");
-                udpServer.sendMessage(((Boolean)mediaPlayer.isPlaying()).toString() + "-" +
-                        mediaPlayer.getCurrentPosition() + "-" + new Date().getTime());
+                udpServer.sendMessage(mMusicInfo.getMusicName() + "-" + mMusicInfo.getDurationTime() +
+                        "-" + mediaPlayer.isPlaying() + "-" + mediaPlayer.getCurrentPosition() +
+                        "-" + new Date().getTime());
                 Log.i(TAG, "send.");
                 try {
                     Thread.sleep(1000);
@@ -98,21 +96,26 @@ public class HostService extends Service {
         return mediaPlayer.isPlaying();
     }
 
+    public int getCurrentPosition() {
+        return mediaPlayer.getCurrentPosition();
+    };
+
     public static Intent newIntent(Context context) {
         return new Intent(context, HostService.class);
     }
 
     @Override
     public void onDestroy() {
-        this.flag = false;
         udpServer.closeSocket();
         mSocketServer.stopSocket();
+        Log.i(TAG, "onDestroy");
         super.onDestroy();
     }
 
     @Override
     public void onCreate() {
         Log.i(TAG, "start.");
+        setListener();
         mHandler = new Handler() {
 
             public void handleMessage(Message msg) {
@@ -160,30 +163,46 @@ public class HostService extends Service {
                 mediaPlayer.reset();//把各项参数恢复到初始状态
                 mediaPlayer.setDataSource(musicInfo.getPath());
                 mediaPlayer.prepare();  //进行缓冲
-                flag = false;
             } catch (Exception e) {
                 e.printStackTrace();
             }
             play(true);
-//            FFmpegMediaMetadataRetriever fmmr = new FFmpegMediaMetadataRetriever();
-//            fmmr.setDataSource(mMusicInfo.getPath());
-//            byte[] cover_data = fmmr.getEmbeddedPicture();
-//            if(cover_data != null) {
-//                mBitmap = BitmapFactory.decodeByteArray(cover_data, 0, cover_data.length);
-//            }
-//            else {
-//                mBitmap = null;
-//            }
-//            sendMessage();
+            //启动子线程解析音乐图片并发送
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    FFmpegMediaMetadataRetriever fmmr = new FFmpegMediaMetadataRetriever();
+                    fmmr.setDataSource(mMusicInfo.getPath());
+                    byte[] cover_data = fmmr.getEmbeddedPicture();
+                    if(cover_data != null) {
+                        mBitmap = BitmapFactory.decodeByteArray(cover_data, 0, cover_data.length);
+                    }
+                    else {
+                        mBitmap = null;
+                    }
+                    sendBroadcast();
+                }
+            }).start();
+
         }
     }
 
+    //音乐播放完毕后回调
     private void setListener() {
         mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
                 sendMessage();
+                sendBroadcast();
             }
         });
     }
+
+    //发送应用内广播
+    private void sendBroadcast() {
+        Intent intent = new Intent();
+        intent.setAction(UIREFRESH_PRIVATE);
+        sendBroadcast(intent);
+    }
+
 }

@@ -29,33 +29,36 @@
             android:src="@drawable/default_cover"
             android:layout_centerHorizontal="true"
             android:padding="@dimen/cover_padding"
-            android:contentDescription="@string/music_cover"/>
+            android:contentDescription="@string/music_cover"
+            tools:ignore="UnusedAttribute"/>
+
+        <TextView
+            android:id="@+id/musicTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/musicCover"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="center_horizontal"
+            android:ellipsize="marquee"
+            android:lines="1"
+            android:text="@string/music_name"
+            android:layout_margin="@dimen/default_margin"
+            android:textSize="20sp"/>
+
+        <TextView
+            android:id="@+id/singerName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:ellipsize="marquee"
+            android:lines="1"
+            android:text="@string/singer_name"
+            android:textSize="14sp"
+            android:layout_below="@+id/musicTitle"
+            android:layout_margin="@dimen/default_margin"
+            android:layout_centerHorizontal="true"/>
 
     </android.support.percent.PercentRelativeLayout>
-
-    <TextView
-        android:id="@+id/musicTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_margin="@dimen/default_margin"
-        android:ellipsize="marquee"
-        android:lines="1"
-        android:text="@string/music_name"
-        android:textSize="18sp"
-        />
-
-    <TextView
-        android:id="@+id/singerName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_margin="@dimen/default_margin"
-        android:ellipsize="marquee"
-        android:lines="1"
-        android:text="@string/singer_name"
-        android:textSize="12sp"
-        />
 
     <ProgressBar
         android:id="@+id/progressBar"
@@ -63,6 +66,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:max="100"
+        android:layout_marginTop="@dimen/default_margin"
+        android:layout_marginBottom="@dimen/default_margin"
         android:progress="0"/>
 
     <RelativeLayout
