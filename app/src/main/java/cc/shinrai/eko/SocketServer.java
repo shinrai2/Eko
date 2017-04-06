@@ -3,6 +3,8 @@ package cc.shinrai.eko;
 import android.app.Service;
 import android.content.Context;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 
 import java.io.FileInputStream;
@@ -24,6 +26,7 @@ public class SocketServer {
     private boolean quit;// 是否退出
     private ServerSocket ss = null;
     private String path;
+    private Handler mHandler;
 
     public void setPath(String p) {
         path = p;
@@ -33,8 +36,9 @@ public class SocketServer {
         quit = true;
     }
 
-    public SocketServer(int port) {
+    public SocketServer(int port, Handler handler) {
         this.port = port;
+        this.mHandler = handler;
         quit = false;
         // 初始化线程池
         executorService = Executors.newFixedThreadPool(Runtime.getRuntime()
@@ -91,6 +95,9 @@ public class SocketServer {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        Message msg = new Message();
+        msg.what = HostService.SEND_MESSAGE;
+        mHandler.sendMessage(msg);
     }
 
 }

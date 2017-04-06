@@ -29,7 +29,7 @@ public class MusicListActivity extends AppCompatActivity {
     private PercentRelativeLayout mPercentRelativeLayout;
     private MusicAdapter mAdapter;
     private List<MusicInfo> musicInfoList;
-    private Handler mUIHandler;
+    private Handler mUIHandler;//启动时音乐读取时显示progressdialog的handler
     private MusicInfo mMusicInfo;
     private ImageView mPicView;
     private ProgressDialog mProgressDialog;
@@ -125,7 +125,7 @@ public class MusicListActivity extends AppCompatActivity {
             mPicView.setImageBitmap(bitmap);
         }
         else {
-            mPicView.setImageResource(R.drawable.e);
+            mPicView.setImageResource(R.drawable.default_cover);
         }
         if(musicInfo != null) {
             mPercentRelativeLayout.setVisibility(View.VISIBLE);

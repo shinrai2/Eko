@@ -24,6 +24,7 @@ import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.util.Timer;
 
 public class HostActivity extends AppCompatActivity {
     public static final String TAG = "HostActivity";
@@ -37,6 +38,7 @@ public class HostActivity extends AppCompatActivity {
     private boolean ap_state;                   //记录AP状态
     private HostService hostService;
     private MusicInfo mMusicInfo;
+    private Timer mTimer;
 
     //ServiceConnection
     private ServiceConnection sc = new ServiceConnection() {
@@ -61,7 +63,7 @@ public class HostActivity extends AppCompatActivity {
                 mCoverView.setImageBitmap(bitmap);
             }
             else {
-                mCoverView.setImageResource(R.drawable.e);
+                mCoverView.setImageResource(R.drawable.default_cover);
             }
         }
 
@@ -74,7 +76,7 @@ public class HostActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getSupportActionBar().hide();
+//        getSupportActionBar().hide();
         setContentView(R.layout.activity_host);
 
         //初始化wifi管理、各种操作的按钮

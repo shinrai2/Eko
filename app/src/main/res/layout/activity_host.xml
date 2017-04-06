@@ -11,30 +11,6 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="cc.shinrai.eko.HostActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/music_name"
-        android:id="@+id/musicTitle"
-        android:textSize="18sp"
-        android:lines="1"
-        android:ellipsize="marquee"
-        android:layout_margin="@dimen/default_margin"
-        android:layout_gravity="center_horizontal"
-        />
-
-    <TextView
-        android:id="@+id/singerName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/singer_name"
-        android:textSize="12sp"
-        android:lines="1"
-        android:ellipsize="marquee"
-        android:layout_margin="@dimen/default_margin"
-        android:layout_gravity="center_horizontal"
-        />
-
     <android.support.percent.PercentRelativeLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -50,11 +26,36 @@
             app:layout_widthPercent="100%"
             app:layout_aspectRatio="100%"
             android:id="@+id/musicCover"
-            android:src="@drawable/e"
+            android:src="@drawable/default_cover"
             android:layout_centerHorizontal="true"
+            android:padding="@dimen/cover_padding"
             android:contentDescription="@string/music_cover"/>
 
     </android.support.percent.PercentRelativeLayout>
+
+    <TextView
+        android:id="@+id/musicTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_margin="@dimen/default_margin"
+        android:ellipsize="marquee"
+        android:lines="1"
+        android:text="@string/music_name"
+        android:textSize="18sp"
+        />
+
+    <TextView
+        android:id="@+id/singerName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_margin="@dimen/default_margin"
+        android:ellipsize="marquee"
+        android:lines="1"
+        android:text="@string/singer_name"
+        android:textSize="12sp"
+        />
 
     <ProgressBar
         android:id="@+id/progressBar"

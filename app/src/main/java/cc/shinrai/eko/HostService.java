@@ -8,7 +8,9 @@ import android.graphics.BitmapFactory;
 import android.media.MediaPlayer;
 import android.os.Binder;
 import android.os.Environment;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
@@ -22,6 +24,8 @@ import wseemann.media.FFmpegMediaMetadataRetriever;
  */
 
 public class HostService extends Service {
+    public static final int SEND_MESSAGE = 9;
+
     private static final String TAG = "HostService";
     private SocketServer mSocketServer;
     private UdpServer udpServer;
@@ -29,6 +33,7 @@ public class HostService extends Service {
     private boolean flag = true; //udp标记
     private MusicInfo mMusicInfo;
     private Bitmap mBitmap;
+    private Handler mHandler;//在tcp发送歌曲完毕后的handler
 
     public Bitmap getBitmap() {
         return mBitmap;
@@ -66,26 +71,26 @@ public class HostService extends Service {
             @Override
             public void run() {
                 Log.i(TAG, "before send.");
-                while (true) {
-                    udpServer.sendMessage(((Boolean)mediaPlayer.isPlaying()).toString() + "-" +
-                            mediaPlayer.getCurrentPosition() + "-" + new Date().getTime());
-                    Log.i(TAG, "send.");
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                udpServer.sendMessage(((Boolean)mediaPlayer.isPlaying()).toString() + "-" +
+                        mediaPlayer.getCurrentPosition() + "-" + new Date().getTime());
+                Log.i(TAG, "send.");
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
             }
         }).start();
     }
 
-    public void play(boolean play) {
-        if(play) {
+    public void play(boolean isPlay) {
+        if(isPlay) {
             mediaPlayer.start();
+            sendMessage();
         }
         else {
             mediaPlayer.pause();
+            sendMessage();
         }
     }
 
@@ -108,6 +113,18 @@ public class HostService extends Service {
     @Override
     public void onCreate() {
         Log.i(TAG, "start.");
+        mHandler = new Handler() {
+
+            public void handleMessage(Message msg) {
+                switch (msg.what) {
+                    case SEND_MESSAGE:
+                        HostService.this.sendMessage();
+                        break;
+                    default:
+                        break;
+                }
+            }
+        };
         onSocketStart();
         super.onCreate();
     }
@@ -115,9 +132,9 @@ public class HostService extends Service {
     public void onSocketStart() {
         //udp启动
         udpServer = new UdpServer();
-        sendMessage();
+//        sendMessage();
         //tcp启动
-        mSocketServer = new SocketServer(9999);
+        mSocketServer = new SocketServer(9999, mHandler);
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -136,6 +153,9 @@ public class HostService extends Service {
             mMusicInfo = musicInfo;
             mSocketServer.setPath(mMusicInfo.getPath());
             //设置发送文件的路径
+            if(mediaPlayer.isPlaying() == true) {
+                play(false);
+            }
             try {
                 mediaPlayer.reset();//把各项参数恢复到初始状态
                 mediaPlayer.setDataSource(musicInfo.getPath());
@@ -144,15 +164,26 @@ public class HostService extends Service {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            FFmpegMediaMetadataRetriever fmmr = new FFmpegMediaMetadataRetriever();
-            fmmr.setDataSource(mMusicInfo.getPath());
-            byte[] cover_data = fmmr.getEmbeddedPicture();
-            if(cover_data != null) {
-                mBitmap = BitmapFactory.decodeByteArray(cover_data, 0, cover_data.length);
-            }
-            else {
-                mBitmap = null;
-            }
+            play(true);
+//            FFmpegMediaMetadataRetriever fmmr = new FFmpegMediaMetadataRetriever();
+//            fmmr.setDataSource(mMusicInfo.getPath());
+//            byte[] cover_data = fmmr.getEmbeddedPicture();
+//            if(cover_data != null) {
+//                mBitmap = BitmapFactory.decodeByteArray(cover_data, 0, cover_data.length);
+//            }
+//            else {
+//                mBitmap = null;
+//            }
+//            sendMessage();
         }
+    }
+
+    private void setListener() {
+        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                sendMessage();
+            }
+        });
     }
 }
