@@ -27,6 +27,41 @@
         android:visibility="gone"
         tools:ignore="UnusedAttribute">
 
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@+id/musicPic"
+            android:layout_toStartOf="@+id/musicPic">
+
+            <TextView
+                android:id="@+id/musicTitleOnBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_margin="@dimen/default_margin"
+                android:ellipsize="marquee"
+                android:lines="1"
+                android:text="@string/music_title_bar"
+                android:textSize="20sp"
+                tools:ignore="RtlHardcoded"/>
+
+            <TextView
+                android:id="@+id/singerNameBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/musicTitleOnBar"
+                android:layout_margin="@dimen/default_margin"
+                android:text="@string/singer_name_bar"
+                android:textSize="14sp"/>
+        </RelativeLayout>
+
         <ImageView
             android:id="@+id/musicPic"
             android:layout_width="0dp"
@@ -40,22 +75,6 @@
             app:layout_aspectRatio="100%"
             app:layout_heightPercent="100%"
             tools:ignore="ContentDescription"/>
-
-        <TextView
-            android:id="@+id/musicTitleOnBar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="@dimen/default_margin"
-            android:layout_toLeftOf="@+id/musicPic"
-            android:layout_toStartOf="@+id/musicPic"
-            android:ellipsize="marquee"
-            android:lines="1"
-            android:text="@string/music_title"
-            android:textSize="20sp"
-            tools:ignore="RtlHardcoded"/>
 
 
     </android.support.percent.PercentRelativeLayout>

@@ -7,21 +7,15 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaPlayer;
 import android.os.Binder;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.zip.CRC32;
-import java.util.zip.CheckedInputStream;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import wseemann.media.FFmpegMediaMetadataRetriever;
 
@@ -68,10 +62,12 @@ public class HostService extends Service {
             @Override
             public void run() {
                 Log.i(TAG, "before send.");
-                udpServer.sendMessage(mMusicInfo.getMusicName() + "-" + mMusicInfo.getDurationTime() +
+                String tmpmsg = mMusicInfo.getMusicName() + "-" + mMusicInfo.getDurationTime() +
                         "-" + mediaPlayer.isPlaying() + "-" + mediaPlayer.getCurrentPosition() +
-                        "-" + new Date().getTime());
-                Log.i(TAG, "send.");
+                        "-" + new Date().getTime();
+
+                udpServer.sendMessage(tmpmsg);
+                Log.i(TAG, tmpmsg + " had sent.");
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
@@ -92,10 +88,12 @@ public class HostService extends Service {
         }
     }
 
+    //获取播放状态 TRUE = 播放 FALSE = 暂停
     public boolean isPlaying() {
         return mediaPlayer.isPlaying();
     }
 
+    //获取目前播放的位置
     public int getCurrentPosition() {
         return mediaPlayer.getCurrentPosition();
     };
@@ -150,6 +148,7 @@ public class HostService extends Service {
         }).start();
     }
 
+    //缓冲音乐并开始播放
     public void prepare(MusicInfo musicInfo) {
         //musicInfo 和 mMusicInfo 位置不能调换
         if(musicInfo.equals_(mMusicInfo) == false) {
@@ -192,13 +191,14 @@ public class HostService extends Service {
         mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
+                mediaPlayer.seekTo(0);
                 sendMessage();
                 sendBroadcast();
             }
         });
     }
 
-    //发送应用内广播
+    //发送刷新UI界面的应用内广播
     private void sendBroadcast() {
         Intent intent = new Intent();
         intent.setAction(UIREFRESH_PRIVATE);

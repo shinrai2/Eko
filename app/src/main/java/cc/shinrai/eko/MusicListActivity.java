@@ -23,14 +23,17 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.TimeZone;
 
 public class MusicListActivity extends AppCompatActivity {
     public static final int RECYCLERVIEW_REFLESH = 1;
     public static final int MUSIC_LIST_UPDATE_REFLESH = 2;
     private static final String TAG = "MusicListActivity";
     private RecyclerView mMusicRecyclerView;
-    private TextView mMusicTitleOnBar;
+    private TextView mMusicTitleOnBar;//栏的音乐title
+    private TextView mSingerNameOnBar;//栏的歌手名字
     private PercentRelativeLayout mPercentRelativeLayout;
     private MusicAdapter mAdapter;
     private List<MusicInfo> musicInfoList;
@@ -46,7 +49,7 @@ public class MusicListActivity extends AppCompatActivity {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             hostService = ((HostService.MyBinder)service).getService();
-            setBar(mMusicInfo);
+            setBar();
         }
 
         @Override
@@ -65,6 +68,7 @@ public class MusicListActivity extends AppCompatActivity {
         mPicView = (ImageView)findViewById(R.id.musicPic);
         //栏
         mMusicTitleOnBar = (TextView)findViewById(R.id.musicTitleOnBar);
+        mSingerNameOnBar = (TextView)findViewById(R.id.singerNameBar);
         mPercentRelativeLayout = (PercentRelativeLayout)findViewById(R.id.bottomBar);
         mPercentRelativeLayout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -130,7 +134,7 @@ public class MusicListActivity extends AppCompatActivity {
         super.onStop();
     }
 
-    private void setBar(MusicInfo musicInfo) {
+    private void setBar() {
         //更新音乐信息
         mMusicInfo = hostService.getMusicInfo();
         //栏的textview内容更改和栏的可视操作
@@ -141,9 +145,10 @@ public class MusicListActivity extends AppCompatActivity {
         else {
             mPicView.setImageResource(R.drawable.default_cover);
         }
-        if(musicInfo != null) {
+        if(mMusicInfo != null) {
             mPercentRelativeLayout.setVisibility(View.VISIBLE);
-            mMusicTitleOnBar.setText(musicInfo.getMusicName());
+            mMusicTitleOnBar.setText(mMusicInfo.getMusicName());
+            mSingerNameOnBar.setText(mMusicInfo.getSingerName());
         }
         else {
             mPercentRelativeLayout.setVisibility(View.GONE);
@@ -169,13 +174,16 @@ public class MusicListActivity extends AppCompatActivity {
             musicInfo = m;
             mMusicNameTextView.setText(musicInfo.getMusicName());
             mSingerNameTextView.setText(musicInfo.getSingerName());
-            mMusicTimeTextView.setText(musicInfo.getDurationTime());
+            mMusicTimeTextView.setText(formatDurationTime(musicInfo.getDurationTime()));
         }
 
         //格式化音乐时长的字符串成便于人阅读的时间字符串
         private String formatDurationTime(String durationTime) {
-            int tmpint = Integer.parseInt(durationTime);
-            
+            int sec = Integer.parseInt(durationTime);
+            SimpleDateFormat formatter = new SimpleDateFormat("mm:ss");
+            formatter.setTimeZone(TimeZone.getTimeZone("GMT+00:00"));
+            String ms = formatter.format(sec);
+            return ms;
         }
 
         public MusicHolder(View itemView) {
@@ -230,7 +238,7 @@ public class MusicListActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.i(TAG, "ContentReceiver");
-            setBar(mMusicInfo);
+            setBar();
         }
     }
 

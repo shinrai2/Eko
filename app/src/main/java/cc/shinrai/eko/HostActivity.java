@@ -57,7 +57,17 @@ public class HostActivity extends AppCompatActivity {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             hostService = ((HostService.MyBinder)service).getService();
-            mTimer.schedule(mTimerTask, 0, 50);
+            if(mTimerTask == null) {
+                mTimerTask = new TimerTask() {
+                    @Override
+                    public void run() {
+                        Message msg = new Message();
+                        msg.what = TIMER_REFRESH;
+                        mTimerHandler.sendMessage(msg);
+                    }
+                };
+                mTimer.schedule(mTimerTask, 0, 50);
+            }
             //刷新UI
             UIrefresh();
         }
@@ -119,14 +129,6 @@ public class HostActivity extends AppCompatActivity {
                     default:
                         break;
                 }
-            }
-        };
-        mTimerTask = new TimerTask() {
-            @Override
-            public void run() {
-                Message msg = new Message();
-                msg.what = TIMER_REFRESH;
-                mTimerHandler.sendMessage(msg);
             }
         };
 
@@ -276,9 +278,11 @@ public class HostActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        //注销广播接收器
         if (mReceiver != null) {
             unregisterReceiver(mReceiver);
         }
+        //关闭进度条timer
         if(mTimerTask != null) {
             mTimerTask.cancel();
         }
