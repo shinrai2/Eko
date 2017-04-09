@@ -150,7 +150,6 @@ public class HostService extends Service {
 
     //缓冲音乐并开始播放
     public void prepare(MusicInfo musicInfo) {
-        //musicInfo 和 mMusicInfo 位置不能调换
         if(musicInfo.equals_(mMusicInfo) == false) {
             mMusicInfo = musicInfo;
             mSocketServer.setPath(mMusicInfo.getPath());

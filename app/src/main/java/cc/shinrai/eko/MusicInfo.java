@@ -43,7 +43,7 @@ public class MusicInfo implements Serializable {
     }
 
     public boolean equals_(MusicInfo mi) {
-        if(mi != null) {
+        if(mi != null && this != null) {
             if (this.getMusicName().equals(mi.getMusicName()) &&
                     this.getSingerName().equals(mi.getSingerName()) &&
                     this.getDurationTime().equals(mi.getDurationTime())) {

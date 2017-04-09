@@ -176,13 +176,12 @@ public class HostActivity extends AppCompatActivity {
                 if(hostService.isPlaying()) {
 //                    hostService.setFlag(false);//按钮及启用代码状态标记
                     hostService.play(false);
-                    mPlayButton.setText(R.string.play);
                 }
                 else {
 //                    hostService.setFlag(true);
                     hostService.play(true);
-                    mPlayButton.setText(R.string.pause);
                 }
+                UIrefresh();
             }
         });
 
