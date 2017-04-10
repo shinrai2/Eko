@@ -76,9 +76,9 @@ public class MusicListActivity extends AppCompatActivity {
                         .setShadowDy(3)
                         .setShadowRadius(5)
                 , mPicView);
-        mMusicTitleOnBar = (TextView)findViewById(R.id.musicTitleOnBar);
-        mSingerNameOnBar = (TextView)findViewById(R.id.singerNameBar);
-        mPercentRelativeLayout = (PercentRelativeLayout)findViewById(R.id.bottomBar);
+        mMusicTitleOnBar         = (TextView)findViewById(R.id.musicTitleOnBar);
+        mSingerNameOnBar         = (TextView)findViewById(R.id.singerNameBar);
+        mPercentRelativeLayout   = (PercentRelativeLayout)findViewById(R.id.bottomBar);
         mPercentRelativeLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -114,10 +114,10 @@ public class MusicListActivity extends AppCompatActivity {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                MusicLab musicLab = MusicLab.get(MusicListActivity.this, mUIHandler);
-                musicInfoList = musicLab.getMusicInfos();
-                Message message = new Message();
-                message.what = RECYCLERVIEW_REFLESH;
+                MusicLab musicLab    = MusicLab.get(MusicListActivity.this, mUIHandler);
+                musicInfoList        = musicLab.getMusicInfos();
+                Message message      = new Message();
+                message.what         = RECYCLERVIEW_REFLESH;
                 mUIHandler.sendMessage(message);
             }
         }).start();
@@ -146,9 +146,9 @@ public class MusicListActivity extends AppCompatActivity {
     //刷新UI界面
     private void UIrefresh() {
         //更新音乐信息
-        mMusicInfo = hostService.getMusicInfo();
+        mMusicInfo       = hostService.getMusicInfo();
         //栏的textview内容更改和栏的可视操作
-        Bitmap bitmap = hostService.getBitmap();
+        Bitmap bitmap    = hostService.getBitmap();
         if(bitmap != null) {
             mPicView.setImageBitmap(bitmap);
         }
@@ -199,19 +199,20 @@ public class MusicListActivity extends AppCompatActivity {
         public MusicHolder(View itemView) {
             super(itemView);
 
-            mMusicNameTextView = (TextView)itemView.findViewById(R.id.music_name);
-            mSingerNameTextView = (TextView)itemView.findViewById(R.id.singer_name);
-            mMusicTimeTextView = (TextView)itemView.findViewById(R.id.music_time);
+            mMusicNameTextView   = (TextView)itemView.findViewById(R.id.music_name);
+            mSingerNameTextView  = (TextView)itemView.findViewById(R.id.singer_name);
+            mMusicTimeTextView   = (TextView)itemView.findViewById(R.id.music_time);
             itemView.setOnClickListener(this);
         }
 
+        //点击列表项目
         @Override
         public void onClick(View v) {
             mMusicInfo = musicInfo;
             if(mMusicInfo != null) {
                 hostService.prepare(mMusicInfo);
             }
-//            setBar(musicInfo);
+//            musicInfoList.
             Intent i = new Intent(MusicListActivity.this, HostActivity.class);
             startActivity(i);
         }

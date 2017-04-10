@@ -12,10 +12,7 @@ import android.os.IBinder;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.util.Log;
-
 import java.util.Date;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import wseemann.media.FFmpegMediaMetadataRetriever;
 
@@ -71,10 +68,10 @@ public class HostService extends Service {
             @Override
             public void run() {
                 Log.i(TAG, "before send.");
+                //构造包含同步消息的字符串
                 String tmpmsg = mMusicInfo.getMusicName() + "-" + mMusicInfo.getDurationTime() +
                         "-" + mediaPlayer.isPlaying() + "-" + mediaPlayer.getCurrentPosition() +
                         "-" + new Date().getTime();
-
                 udpServer.sendMessage(tmpmsg);
                 Log.i(TAG, tmpmsg + " had sent.");
                 try {

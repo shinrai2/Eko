@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -21,15 +22,16 @@
         >
 
         <ImageView
-            android:layout_height="0dp"
-            android:layout_width="0dp"
-            app:layout_widthPercent="100%"
-            app:layout_aspectRatio="100%"
             android:id="@+id/musicCover"
-            android:src="@drawable/default_cover"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
             android:layout_centerHorizontal="true"
-            android:padding="@dimen/cover_padding"
+            android:adjustViewBounds="false"
             android:contentDescription="@string/music_cover"
+            android:padding="@dimen/cover_padding"
+            android:src="@drawable/default_cover"
+            app:layout_aspectRatio="100%"
+            app:layout_widthPercent="100%"
             tools:ignore="UnusedAttribute"/>
 
         <TextView
@@ -71,39 +73,47 @@
         android:progress="0"/>
 
     <RelativeLayout
-        android:orientation="horizontal"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
-        android:layout_weight="2"
         android:layout_gravity="center_horizontal"
+        android:layout_weight="2"
+        android:orientation="horizontal"
         >
 
         <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/open_wireless_text"
             android:id="@+id/wireless_button"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"/>
-
-        <Button
-            android:id="@+id/play_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/play"
-            android:layout_alignParentBottom="true"
-            android:layout_toRightOf="@+id/wireless_button"
-            android:layout_toEndOf="@+id/wireless_button"/>
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:text="@string/open_wireless_text"
+            android:visibility="gone"/>
 
         <Button
             android:id="@+id/file_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toEndOf="@+id/play_image_button"
+            android:layout_toRightOf="@+id/play_image_button"
             android:text="@string/file"
-            android:layout_alignParentBottom="true"
-            android:layout_toRightOf="@+id/play_button"
-            android:layout_toEndOf="@+id/play_button"/>
+            android:visibility="gone"/>
+
+        <ImageButton
+            android:id="@+id/play_image_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_toEndOf="@+id/wireless_button"
+            android:layout_toRightOf="@+id/wireless_button"
+            android:adjustViewBounds="true"
+            android:backgroundTint="#00ffffff"
+            android:contentDescription=""
+            android:cropToPadding="false"
+            android:scaleType="fitXY"
+            app:srcCompat="@drawable/pause"
+            tools:ignore="ContentDescription,UnusedAttribute"/>
 
     </RelativeLayout>
 

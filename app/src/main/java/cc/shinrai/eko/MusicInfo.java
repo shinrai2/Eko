@@ -42,6 +42,7 @@ public class MusicInfo implements Serializable {
         mPath = path;
     }
 
+    //判断两个实例是否相同(数值意义上)
     public static boolean equals_(MusicInfo a, MusicInfo b) {
         if(a != null && b != null) {
             if (a.getMusicName().equals(b.getMusicName()) &&

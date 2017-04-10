@@ -31,11 +31,11 @@ public class MusicLab {
 
     private MusicLab(Context context, Handler handler) {
         //从数据库中读取数据
-        mContext = context;
-        mHandler = handler;
-        mDatabase = new MusicBaseHelper(mContext)
+        mContext         = context;
+        mHandler         = handler;
+        mDatabase        = new MusicBaseHelper(mContext)
                 .getWritableDatabase();
-        mMusicInfoList = new ArrayList<>();
+        mMusicInfoList   = new ArrayList<>();
         Log.i(TAG, "query");
         query();
     }
@@ -64,14 +64,14 @@ public class MusicLab {
                 String path = file.getPath();
 //                Log.i(TAG, path);
                 fmmr.setDataSource(path);
-                String music_name = fmmr.extractMetadata(
+                String music_name    = fmmr.extractMetadata(
                         FFmpegMediaMetadataRetriever.METADATA_KEY_TITLE);
-                String singer_name = fmmr.extractMetadata(
+                String singer_name   = fmmr.extractMetadata(
                         FFmpegMediaMetadataRetriever.METADATA_KEY_ARTIST);
                 String duration_time = fmmr.extractMetadata(
                         FFmpegMediaMetadataRetriever.METADATA_KEY_DURATION);
 
-                if(music_name == null) music_name = "unknown";
+                if(music_name == null)  music_name  = "unknown";
                 if(singer_name == null) singer_name = "unknown";
                 MusicInfo musicInfo = new MusicInfo();
                 musicInfo.setMusicName(music_name);
@@ -82,6 +82,7 @@ public class MusicLab {
                 mMusicInfoList.add(musicInfo);
                 Message message = new Message();
                 message.what = MusicListActivity.MUSIC_LIST_UPDATE_REFLESH;
+                //刷新progressdialog信息，避免糟糕的用户体验(!)
                 message.obj = "Add music : \n" + music_name + " - " + singer_name + " ..";
                 mHandler.sendMessage(message);
             }

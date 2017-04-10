@@ -21,6 +21,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -40,7 +41,7 @@ public class HostActivity extends AppCompatActivity {
     public static final String  TAG = "HostActivity";
     public static final int     TIMER_REFRESH = 7;
     private Button              mWirelessButton;
-    private Button              mPlayButton;
+    private ImageButton         mPlay_image_button;
     private Button              mFileButton;
     private TextView            mMusicName;
     private TextView            mSingerName;
@@ -90,10 +91,10 @@ public class HostActivity extends AppCompatActivity {
             mProgressBar.setMax(Integer.parseInt(mMusicInfo.getDurationTime()));
         }
         if(hostService.isPlaying() == false) {
-            mPlayButton.setText(R.string.play);
+            mPlay_image_button.setImageResource(R.drawable.play);
         }
         else {
-            mPlayButton.setText(R.string.pause);
+            mPlay_image_button.setImageResource(R.drawable.pause);
 
         }
         Bitmap bitmap = hostService.getBitmap();
@@ -112,15 +113,15 @@ public class HostActivity extends AppCompatActivity {
         setContentView(R.layout.activity_host);
 
         //初始化wifi管理、各种操作的按钮
-        wifiManager = (WifiManager)getApplicationContext()
+        wifiManager      = (WifiManager)getApplicationContext()
                 .getSystemService(Context.WIFI_SERVICE);
-        mWirelessButton = (Button)findViewById(R.id.wireless_button);
-        mPlayButton = (Button)findViewById(R.id.play_button);
-        mFileButton = (Button)findViewById(R.id.file_button);
-        mMusicName = (TextView)findViewById(R.id.musicTitle);
-        mSingerName = (TextView)findViewById(R.id.singerName);
-        mCoverView = (ImageView)findViewById(R.id.musicCover);
-        mProgressBar = (ProgressBar)findViewById(R.id.progressBar);
+        mWirelessButton  = (Button)findViewById(R.id.wireless_button);
+        mPlay_image_button = (ImageButton)findViewById(R.id.play_image_button);
+        mFileButton      = (Button)findViewById(R.id.file_button);
+        mMusicName       = (TextView)findViewById(R.id.musicTitle);
+        mSingerName      = (TextView)findViewById(R.id.singerName);
+        mCoverView       = (ImageView)findViewById(R.id.musicCover);
+        mProgressBar     = (ProgressBar)findViewById(R.id.progressBar);
         ShadowViewHelper.bindShadowHelper(new ShadowProperty()
                 .setShadowColor(0x77000000)
                 .setShadowDx(3)
@@ -180,7 +181,7 @@ public class HostActivity extends AppCompatActivity {
         });
 
         //播放/暂停音乐
-        mPlayButton.setOnClickListener(new View.OnClickListener() {
+        mPlay_image_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(hostService.isPlaying()) {
