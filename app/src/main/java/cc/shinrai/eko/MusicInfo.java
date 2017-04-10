@@ -42,11 +42,11 @@ public class MusicInfo implements Serializable {
         mPath = path;
     }
 
-    public boolean equals_(MusicInfo mi) {
-        if(mi != null && this != null) {
-            if (this.getMusicName().equals(mi.getMusicName()) &&
-                    this.getSingerName().equals(mi.getSingerName()) &&
-                    this.getDurationTime().equals(mi.getDurationTime())) {
+    public static boolean equals_(MusicInfo a, MusicInfo b) {
+        if(a != null && b != null) {
+            if (a.getMusicName().equals(b.getMusicName()) &&
+                    a.getSingerName().equals(b.getSingerName()) &&
+                    a.getDurationTime().equals(b.getDurationTime())) {
                 return true;
             }
         }

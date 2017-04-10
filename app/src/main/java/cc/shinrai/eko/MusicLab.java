@@ -22,12 +22,12 @@ import wseemann.media.FFmpegMediaMetadataRetriever;
 
 public class MusicLab {
     private static final String TAG = "MusicLab";
-    private static MusicLab sMusicLab;
-    private List<MusicInfo> mMusicInfoList;
-    private Context mContext;
-    private SQLiteDatabase mDatabase;
-    private String basePath = "/storage/sdcard1/netease/cloudmusic/Music/";
-    private Handler mHandler;
+    private static MusicLab     sMusicLab;
+    private List<MusicInfo>     mMusicInfoList;
+    private Context             mContext;
+    private SQLiteDatabase      mDatabase;
+    private String              basePath = "/storage/sdcard1/netease/cloudmusic/Music/";
+    private Handler             mHandler;
 
     private MusicLab(Context context, Handler handler) {
         //从数据库中读取数据

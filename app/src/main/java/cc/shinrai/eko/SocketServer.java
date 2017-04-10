@@ -21,12 +21,12 @@ import java.util.concurrent.Executors;
 
 public class SocketServer {
     private static final String TAG = "SocketServer";
-    private int port;// 监听端口
+    private int             port;// 监听端口
     private ExecutorService executorService;// 线程池
-    private boolean quit;// 是否退出
-    private ServerSocket ss = null;
-    private String path;
-    private Handler mHandler;
+    private boolean         quit;// 是否退出
+    private ServerSocket    ss = null;
+    private String          path;
+    private Handler         mHandler;
 
     public void setPath(String p) {
         path = p;

@@ -17,26 +17,26 @@
     <uses-permission android:name="cc.shinrai.eko.UIREFRESH_PRIVATE" />
 
     <application
-        android:name=".RecApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity android:name=".MainActivity"
+                  android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".HostActivity">
+        <activity android:name=".HostActivity"
+                  android:screenOrientation="portrait">
         </activity>
-
+        <activity android:name=".MusicListActivity"
+                  android:screenOrientation="portrait">
+        </activity>
         <service android:name=".HostService"/>
-
-        <activity android:name=".MusicListActivity">
-        </activity>
     </application>
 
 </manifest>

@@ -23,25 +23,28 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.wangjie.shadowviewhelper.ShadowProperty;
+import com.wangjie.shadowviewhelper.ShadowViewHelper;
+
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.TimeZone;
 
 public class MusicListActivity extends AppCompatActivity {
-    public static final int RECYCLERVIEW_REFLESH = 1;
-    public static final int MUSIC_LIST_UPDATE_REFLESH = 2;
+    public static final int     RECYCLERVIEW_REFLESH = 1;
+    public static final int     MUSIC_LIST_UPDATE_REFLESH = 2;
     private static final String TAG = "MusicListActivity";
-    private RecyclerView mMusicRecyclerView;
-    private TextView mMusicTitleOnBar;//栏的音乐title
-    private TextView mSingerNameOnBar;//栏的歌手名字
+    private RecyclerView        mMusicRecyclerView;
+    private TextView            mMusicTitleOnBar;//栏的音乐title
+    private TextView            mSingerNameOnBar;//栏的歌手名字
     private PercentRelativeLayout mPercentRelativeLayout;
-    private MusicAdapter mAdapter;
-    private List<MusicInfo> musicInfoList;
-    private Handler mUIHandler;//启动时音乐读取时显示progressdialog的handler
-    private MusicInfo mMusicInfo;
-    private ImageView mPicView;
-    private ProgressDialog mProgressDialog;
-    private ContentReceiver mReceiver;
+    private MusicAdapter        mAdapter;
+    private List<MusicInfo>     musicInfoList;
+    private Handler             mUIHandler;//启动时音乐读取时显示progressdialog的handler
+    private MusicInfo           mMusicInfo;
+    private ImageView           mPicView;
+    private ProgressDialog      mProgressDialog;
+    private ContentReceiver     mReceiver;
 
     private HostService hostService;
     //ServiceConnection
@@ -49,7 +52,7 @@ public class MusicListActivity extends AppCompatActivity {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             hostService = ((HostService.MyBinder)service).getService();
-            setBar();
+            UIrefresh();
         }
 
         @Override
@@ -65,8 +68,14 @@ public class MusicListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_music_list);
 
         mMusicRecyclerView = (RecyclerView)findViewById(R.id.music_recycler_view);
-        mPicView = (ImageView)findViewById(R.id.musicPic);
         //栏
+        mPicView = (ImageView)findViewById(R.id.musicPic);
+        ShadowViewHelper.bindShadowHelper(new ShadowProperty()
+                        .setShadowColor(0x77000000)
+                        .setShadowDx(3)
+                        .setShadowDy(3)
+                        .setShadowRadius(5)
+                , mPicView);
         mMusicTitleOnBar = (TextView)findViewById(R.id.musicTitleOnBar);
         mSingerNameOnBar = (TextView)findViewById(R.id.singerNameBar);
         mPercentRelativeLayout = (PercentRelativeLayout)findViewById(R.id.bottomBar);
@@ -91,7 +100,7 @@ public class MusicListActivity extends AppCompatActivity {
                     case RECYCLERVIEW_REFLESH:
                         //ProgressDialog消失，刷新列表
                         mProgressDialog.dismiss();
-                        updateUI();
+                        updateList();
                         break;
                     case MUSIC_LIST_UPDATE_REFLESH:
                         //刷新ProgressDialog上面的文本显示
@@ -134,7 +143,8 @@ public class MusicListActivity extends AppCompatActivity {
         super.onStop();
     }
 
-    private void setBar() {
+    //刷新UI界面
+    private void UIrefresh() {
         //更新音乐信息
         mMusicInfo = hostService.getMusicInfo();
         //栏的textview内容更改和栏的可视操作
@@ -156,7 +166,7 @@ public class MusicListActivity extends AppCompatActivity {
     }
 
     //更新列表的UI操作
-    protected void updateUI() {
+    protected void updateList() {
         mAdapter = new MusicAdapter(musicInfoList);
         mMusicRecyclerView.setAdapter(mAdapter);
         mMusicRecyclerView.addItemDecoration(new RecycleViewDivider(MusicListActivity.this, LinearLayoutManager.HORIZONTAL));
@@ -238,7 +248,7 @@ public class MusicListActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.i(TAG, "ContentReceiver");
-            setBar();
+            UIrefresh();
         }
     }
 

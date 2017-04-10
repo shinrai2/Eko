@@ -24,15 +24,24 @@ import wseemann.media.FFmpegMediaMetadataRetriever;
  */
 
 public class HostService extends Service {
-    public static final int SEND_MESSAGE = 9;
-    public static final String UIREFRESH_PRIVATE = "cc.shinrai.eko.UIREFRESH_PRIVATE";
+    public static final int     SEND_MESSAGE = 9;
+    public static final String  UIREFRESH_PRIVATE = "cc.shinrai.eko.UIREFRESH_PRIVATE";
     private static final String TAG = "HostService";
-    private SocketServer mSocketServer;
-    private UdpServer udpServer;
-    private MediaPlayer mediaPlayer =  new MediaPlayer();
-    private MusicInfo mMusicInfo;
-    private Bitmap mBitmap;
-    private Handler mHandler;//在tcp发送歌曲完毕后的handler
+    private SocketServer        mSocketServer;
+    private UdpServer           udpServer;
+    private MediaPlayer         mediaPlayer =  new MediaPlayer();
+    private MusicInfo           mMusicInfo;
+    private Bitmap              mBitmap;
+    private Handler             mHandler;//在tcp发送歌曲完毕后的handler
+    private Boolean             wifi_state = false;
+
+    public Boolean getWifi_state() {
+        return wifi_state;
+    }
+
+    public void setWifi_state(Boolean wifi_state) {
+        this.wifi_state = wifi_state;
+    }
 
     public Bitmap getBitmap() {
         return mBitmap;
@@ -150,7 +159,7 @@ public class HostService extends Service {
 
     //缓冲音乐并开始播放
     public void prepare(MusicInfo musicInfo) {
-        if(musicInfo.equals_(mMusicInfo) == false) {
+        if(MusicInfo.equals_(musicInfo, mMusicInfo) == false) {
             mMusicInfo = musicInfo;
             mSocketServer.setPath(mMusicInfo.getPath());
             //设置发送文件的路径

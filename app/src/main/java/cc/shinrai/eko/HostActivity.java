@@ -26,6 +26,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.wangjie.shadowviewhelper.ShadowProperty;
+import com.wangjie.shadowviewhelper.ShadowViewHelper;
+
 import org.w3c.dom.Text;
 
 import java.io.IOException;
@@ -34,23 +37,23 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class HostActivity extends AppCompatActivity {
-    public static final String TAG = "HostActivity";
-    public static final int TIMER_REFRESH = 7;
-    private Button mWirelessButton;
-    private Button mPlayButton;
-    private Button mFileButton;
-    private TextView mMusicName;
-    private TextView mSingerName;
-    private ProgressBar mProgressBar;
-    private ImageView mCoverView;
-    private WifiManager wifiManager;
-    private boolean ap_state;                   //记录AP状态
-    private HostService hostService;
-    private MusicInfo mMusicInfo;
-    private ContentReceiver mReceiver; //获取应用内广播的receiver
-    private Timer mTimer; //音乐进度条的timer
-    private TimerTask mTimerTask; //上述timer对应的timertask
-    private Handler mTimerHandler; //更改进度条位置的handler
+    public static final String  TAG = "HostActivity";
+    public static final int     TIMER_REFRESH = 7;
+    private Button              mWirelessButton;
+    private Button              mPlayButton;
+    private Button              mFileButton;
+    private TextView            mMusicName;
+    private TextView            mSingerName;
+    private ProgressBar         mProgressBar;
+    private ImageView           mCoverView;
+    private WifiManager         wifiManager;
+    private boolean             ap_state;                   //记录AP状态
+    private HostService         hostService;
+    private MusicInfo           mMusicInfo;
+    private ContentReceiver     mReceiver; //获取应用内广播的receiver
+    private Timer               mTimer; //音乐进度条的timer
+    private TimerTask           mTimerTask; //上述timer对应的timertask
+    private Handler             mTimerHandler; //更改进度条位置的handler
 
     //Service绑定后回调
     private ServiceConnection sc = new ServiceConnection() {
@@ -118,6 +121,13 @@ public class HostActivity extends AppCompatActivity {
         mSingerName = (TextView)findViewById(R.id.singerName);
         mCoverView = (ImageView)findViewById(R.id.musicCover);
         mProgressBar = (ProgressBar)findViewById(R.id.progressBar);
+        ShadowViewHelper.bindShadowHelper(new ShadowProperty()
+                .setShadowColor(0x77000000)
+                .setShadowDx(3)
+                .setShadowDy(3)
+                .setShadowRadius(5)
+        , mCoverView);
+
         mTimer = new Timer();
         mTimerHandler = new Handler() {
 
@@ -152,11 +162,11 @@ public class HostActivity extends AppCompatActivity {
                 Boolean setApReturn = setWifiApEnabled(ap_state);       //设置AP是否成功
                 Log.i("setWifiApEnabled : ", setApReturn.toString());
 
-                boolean wifi_state = getRec().getWifi_state();
+                boolean wifi_state = hostService.getWifi_state();
 
                 if (!ap_state  && setApReturn && wifi_state) {           //判断是否要重新连接wifi
                     wifiManager.setWifiEnabled(true);
-                    getRec().setWifi_state(false);
+                    hostService.setWifi_state(false);
                 }
 
                 //Button标签切换
@@ -203,7 +213,7 @@ public class HostActivity extends AppCompatActivity {
     public boolean setWifiApEnabled(boolean enabled) {
         if (enabled) { // disable WiFi in any case
             if(wifiManager.getWifiState() == 3) {
-                getRec().setWifi_state(true);
+                hostService.setWifi_state(true);
             }
             //wifi和热点不能同时打开，所以打开热点的时候需要关闭wifi
             wifiManager.setWifiEnabled(false);
@@ -289,10 +299,6 @@ public class HostActivity extends AppCompatActivity {
             mTimer.cancel();
         }
         super.onDestroy();
-    }
-
-    public RecApplication getRec() {
-        return ((RecApplication)getApplicationContext());
     }
 
     private class ContentReceiver extends BroadcastReceiver {
