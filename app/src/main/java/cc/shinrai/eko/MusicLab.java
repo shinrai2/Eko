@@ -1,6 +1,5 @@
 package cc.shinrai.eko;
 
-import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
