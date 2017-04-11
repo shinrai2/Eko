@@ -35,12 +35,12 @@ public class MusicListActivity extends AppCompatActivity {
     public static final int     MUSIC_LIST_UPDATE_REFLESH = 2;
     private static final String TAG = "MusicListActivity";
     private RecyclerView        mMusicRecyclerView;
-    private TextView            mMusicTitleOnBar;//栏的音乐title
-    private TextView            mSingerNameOnBar;//栏的歌手名字
+    private TextView            mMusicTitleOnBar;               //栏的音乐title
+    private TextView            mSingerNameOnBar;               //栏的歌手名字
     private PercentRelativeLayout mPercentRelativeLayout;
     private MusicAdapter        mAdapter;
     private List<MusicInfo>     musicInfoList;
-    private Handler             mUIHandler;//启动时音乐读取时显示progressdialog的handler
+    private Handler             mUIHandler;                     //启动时音乐读取时显示progressdialog的handler
     private MusicInfo           mMusicInfo;
     private ImageView           mPicView;
     private ProgressDialog      mProgressDialog;
@@ -212,7 +212,6 @@ public class MusicListActivity extends AppCompatActivity {
             if(mMusicInfo != null) {
                 hostService.prepare(mMusicInfo);
             }
-//            musicInfoList.
             Intent i = new Intent(MusicListActivity.this, HostActivity.class);
             startActivity(i);
         }

@@ -32,6 +32,7 @@ import java.util.TimerTask;
 public class HostActivity extends AppCompatActivity {
     public static final String  TAG = "HostActivity";
     public static final int     TIMER_REFRESH = 7;
+    private boolean             ap_state;           //记录AP状态
     private Button              mWirelessButton;
     private ImageButton         mPlay_image_button;
     private Button              mFileButton;
@@ -40,13 +41,12 @@ public class HostActivity extends AppCompatActivity {
     private ProgressBar         mProgressBar;
     private ImageView           mCoverView;
     private WifiManager         wifiManager;
-    private boolean             ap_state;                   //记录AP状态
     private HostService         hostService;
     private MusicInfo           mMusicInfo;
-    private ContentReceiver     mReceiver; //获取应用内广播的receiver
-    private Timer               mTimer; //音乐进度条的timer
-    private TimerTask           mTimerTask; //上述timer对应的timertask
-    private Handler             mTimerHandler; //更改进度条位置的handler
+    private ContentReceiver     mReceiver;          //获取应用内广播的receiver
+    private Timer               mTimer;             //音乐进度条的timer
+    private TimerTask           mTimerTask;         //上述timer对应的timertask
+    private Handler             mTimerHandler;      //更改进度条位置的handler
 
     //Service绑定后回调
     private ServiceConnection sc = new ServiceConnection() {

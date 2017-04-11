@@ -22,6 +22,7 @@ import java.util.concurrent.Executors;
 public class SocketServer {
     private static final String TAG = "SocketServer";
     private int             port;// 监听端口
+    private final int       BUFFER_SIZE = 65536;
     private ExecutorService executorService;// 线程池
     private boolean         quit;// 是否退出
     private ServerSocket    ss = null;
@@ -66,23 +67,17 @@ public class SocketServer {
 
         @Override
         public void run() {
-            sendData(socket);
+            if(path != null) {
+                sendData(socket);
+            }
         }
     }
 
     private void sendData(Socket socket) {
         try {
-//                InputStream inputStream = socket.getInputStream();
-//                byte buffer[] = new byte[1024 * 4];
-//                int temp = 0;
-//                // 从InputStream当中读取客户端所发送的数据
-//                while ((temp = inputStream.read(buffer)) != -1) {
-//                    Log.i(TAG, new String(buffer, 0, temp));
-//                }
-
             InputStream fileinputStream = new FileInputStream(path);
             OutputStream outputStream = socket.getOutputStream();
-            byte writebuffer[] = new byte[4 * 1024];
+            byte writebuffer[] = new byte[BUFFER_SIZE];
             int wtemp = 0;
             while ((wtemp = fileinputStream.read(writebuffer)) != -1) {
                 // 把数据写入到OuputStream对象中
@@ -90,11 +85,13 @@ public class SocketServer {
             }
             // 发送读取的数据到服务端
             outputStream.flush();
-
-            socket.close();
+            fileinputStream.close();
+            outputStream.close();
+//            socket.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
+        //发送UDP广播
         Message msg = new Message();
         msg.what = HostService.SEND_MESSAGE;
         mHandler.sendMessage(msg);

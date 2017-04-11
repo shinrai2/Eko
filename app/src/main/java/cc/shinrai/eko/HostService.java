@@ -13,6 +13,7 @@ import android.os.Message;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import java.util.Date;
+import java.util.List;
 
 import wseemann.media.FFmpegMediaMetadataRetriever;
 
@@ -29,8 +30,18 @@ public class HostService extends Service {
     private MediaPlayer         mediaPlayer =  new MediaPlayer();
     private MusicInfo           mMusicInfo;
     private Bitmap              mBitmap;
-    private Handler             mHandler;//在tcp发送歌曲完毕后的handler
+    private Handler             mHandler;               //在tcp发送歌曲完毕后的handler
     private Boolean             wifi_state = false;
+    private List<MusicInfo>     musicInfoList;          //音乐信息列表
+    private int                 musicListPosition;      //音乐列表的位置
+
+    public List<MusicInfo> getMusicInfoList() {
+        return musicInfoList;
+    }
+
+    public void setMusicInfoList(List<MusicInfo> musicInfoList) {
+        this.musicInfoList = musicInfoList;
+    }
 
     public Boolean getWifi_state() {
         return wifi_state;
@@ -74,11 +85,6 @@ public class HostService extends Service {
                         "-" + new Date().getTime();
                 udpServer.sendMessage(tmpmsg);
                 Log.i(TAG, tmpmsg + " had sent.");
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
             }
         }).start();
     }
@@ -86,12 +92,11 @@ public class HostService extends Service {
     public void play(boolean isPlay) {
         if(isPlay) {
             mediaPlayer.start();
-            sendMessage();
         }
         else {
             mediaPlayer.pause();
-            sendMessage();
         }
+        sendMessage();
     }
 
     //获取播放状态 TRUE = 播放 FALSE = 暂停
@@ -137,10 +142,8 @@ public class HostService extends Service {
     }
 
     public void onSocketStart() {
-        //udp启动
+        //udp & tcp 启动
         udpServer = new UdpServer();
-//        sendMessage();
-        //tcp启动
         mSocketServer = new SocketServer(9999, mHandler);
         new Thread(new Runnable() {
             @Override
@@ -161,7 +164,7 @@ public class HostService extends Service {
             mSocketServer.setPath(mMusicInfo.getPath());
             //设置发送文件的路径
             if(mediaPlayer.isPlaying() == true) {
-                play(false);
+                mediaPlayer.pause();
             }
             try {
                 mediaPlayer.reset();//把各项参数恢复到初始状态
