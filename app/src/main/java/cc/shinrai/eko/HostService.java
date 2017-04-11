@@ -23,6 +23,9 @@ import wseemann.media.FFmpegMediaMetadataRetriever;
 
 public class HostService extends Service {
     public static final int     SEND_MESSAGE = 9;
+    public static final int     CYCLE_SWITCH = 21;
+    public static final int     REPEAT_ONE_SWITCH = 23;
+    public static final int     SHUFFLE_SWITCH = 27;
     public static final String  UIREFRESH_PRIVATE = "cc.shinrai.eko.UIREFRESH_PRIVATE";
     private static final String TAG = "HostService";
     private SocketServer        mSocketServer;
@@ -33,6 +36,15 @@ public class HostService extends Service {
     private Handler             mHandler;               //在tcp发送歌曲完毕后的handler
     private Boolean             wifi_state = false;
     private List<MusicInfo>     musicInfoList;
+    private int                 musicSwitchMode = CYCLE_SWITCH;//音乐切换模式标记，默认列表循环
+
+    public int getMusicSwitchMode() {
+        return musicSwitchMode;
+    }
+
+    public void setMusicSwitchMode(int musicSwitchMode) {
+        this.musicSwitchMode = musicSwitchMode;
+    }
 
     public List<MusicInfo> getMusicInfoList() {
         return musicInfoList;
@@ -88,8 +100,8 @@ public class HostService extends Service {
         }).start();
     }
 
-    public void play(boolean isPlay) {
-        if(isPlay) {
+    public void play(boolean State) {
+        if(State) {
             mediaPlayer.start();
         }
         else {
@@ -204,11 +216,8 @@ public class HostService extends Service {
             @Override
             public void onCompletion(MediaPlayer mp) {
                 mediaPlayer.seekTo(0);
-//                sendMessage();
-                int index = musicInfoList.indexOf(mMusicInfo);
-                if(musicInfoList.size() > index) {
-                    prepare(musicInfoList.get(index + 1));
-                }
+                //通知播放下一首歌
+                callNextMusic();
                 sendBroadcast();
             }
         });
@@ -219,6 +228,28 @@ public class HostService extends Service {
         Intent intent = new Intent();
         intent.setAction(UIREFRESH_PRIVATE);
         sendBroadcast(intent);
+    }
+
+    private void callNextMusic() {
+
+        switch (musicSwitchMode) {
+            case CYCLE_SWITCH://列表循环
+                int index = musicInfoList.indexOf(mMusicInfo);
+                if(musicInfoList.size() > index) {
+                    prepare(musicInfoList.get(index + 1));
+                }
+                else if(!musicInfoList.isEmpty()) {
+                    prepare(musicInfoList.get(0));
+                }
+                break;
+            case REPEAT_ONE_SWITCH://单一循环
+                play(true);
+                break;
+            case SHUFFLE_SWITCH://随机循环
+                break;
+            default:
+                break;
+        }
     }
 
 }
