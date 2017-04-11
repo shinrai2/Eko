@@ -74,6 +74,10 @@ public class SocketServer {
     }
 
     private void sendData(Socket socket) {
+        //发送UDP广播
+        Message msg = new Message();
+        msg.what = HostService.SEND_MESSAGE;
+        mHandler.sendMessage(msg);
         try {
             InputStream fileinputStream = new FileInputStream(path);
             OutputStream outputStream = socket.getOutputStream();
@@ -91,10 +95,5 @@ public class SocketServer {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        //发送UDP广播
-        Message msg = new Message();
-        msg.what = HostService.SEND_MESSAGE;
-        mHandler.sendMessage(msg);
     }
-
 }

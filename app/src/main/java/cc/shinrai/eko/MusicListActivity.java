@@ -39,7 +39,7 @@ public class MusicListActivity extends AppCompatActivity {
     private TextView            mSingerNameOnBar;               //栏的歌手名字
     private PercentRelativeLayout mPercentRelativeLayout;
     private MusicAdapter        mAdapter;
-    private List<MusicInfo>     musicInfoList;
+//    private List<MusicInfo>     musicInfoList;
     private Handler             mUIHandler;                     //启动时音乐读取时显示progressdialog的handler
     private MusicInfo           mMusicInfo;
     private ImageView           mPicView;
@@ -52,7 +52,20 @@ public class MusicListActivity extends AppCompatActivity {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             hostService = ((HostService.MyBinder)service).getService();
-            UIrefresh();
+            if(hostService.getMusicInfoList() == null) {
+                //在子线程中执行音乐列表读取操作并调用handler
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        MusicLab musicLab = MusicLab.get(MusicListActivity.this, mUIHandler);
+                        hostService.setMusicInfoList(musicLab.getMusicInfos());
+                        Message message = new Message();
+                        message.what = RECYCLERVIEW_REFLESH;
+                        mUIHandler.sendMessage(message);
+                    }
+                }).start();
+                UIrefresh();
+            }
         }
 
         @Override
@@ -110,17 +123,6 @@ public class MusicListActivity extends AppCompatActivity {
                 }
             }
         };
-        //在子线程中执行音乐列表读取操作并调用handler
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                MusicLab musicLab    = MusicLab.get(MusicListActivity.this, mUIHandler);
-                musicInfoList        = musicLab.getMusicInfos();
-                Message message      = new Message();
-                message.what         = RECYCLERVIEW_REFLESH;
-                mUIHandler.sendMessage(message);
-            }
-        }).start();
 
         mReceiver=new ContentReceiver();
         IntentFilter filter = new IntentFilter(
@@ -167,7 +169,7 @@ public class MusicListActivity extends AppCompatActivity {
 
     //更新列表的UI操作
     protected void updateList() {
-        mAdapter = new MusicAdapter(musicInfoList);
+        mAdapter = new MusicAdapter(hostService.getMusicInfoList());
         mMusicRecyclerView.setAdapter(mAdapter);
         mMusicRecyclerView.addItemDecoration(new RecycleViewDivider(MusicListActivity.this, LinearLayoutManager.HORIZONTAL));
     }

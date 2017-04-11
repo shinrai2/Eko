@@ -32,8 +32,7 @@ public class HostService extends Service {
     private Bitmap              mBitmap;
     private Handler             mHandler;               //在tcp发送歌曲完毕后的handler
     private Boolean             wifi_state = false;
-    private List<MusicInfo>     musicInfoList;          //音乐信息列表
-    private int                 musicListPosition;      //音乐列表的位置
+    private List<MusicInfo>     musicInfoList;
 
     public List<MusicInfo> getMusicInfoList() {
         return musicInfoList;
@@ -161,8 +160,8 @@ public class HostService extends Service {
     public void prepare(MusicInfo musicInfo) {
         if(MusicInfo.equals_(musicInfo, mMusicInfo) == false) {
             mMusicInfo = musicInfo;
-            mSocketServer.setPath(mMusicInfo.getPath());
             //设置发送文件的路径
+            mSocketServer.setPath(mMusicInfo.getPath());
             if(mediaPlayer.isPlaying() == true) {
                 mediaPlayer.pause();
             }
@@ -192,6 +191,11 @@ public class HostService extends Service {
             }).start();
 
         }
+        else {
+            if(mediaPlayer.isPlaying() == false) {
+                play(true);
+            }
+        }
     }
 
     //音乐播放完毕后回调
@@ -200,7 +204,11 @@ public class HostService extends Service {
             @Override
             public void onCompletion(MediaPlayer mp) {
                 mediaPlayer.seekTo(0);
-                sendMessage();
+//                sendMessage();
+                int index = musicInfoList.indexOf(mMusicInfo);
+                if(musicInfoList.size() > index) {
+                    prepare(musicInfoList.get(index + 1));
+                }
                 sendBroadcast();
             }
         });
