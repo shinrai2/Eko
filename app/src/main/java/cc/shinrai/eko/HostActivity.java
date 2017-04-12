@@ -177,14 +177,14 @@ public class HostActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if(hostService.isPlaying()) {
-//                    hostService.setFlag(false);//按钮及启用代码状态标记
                     hostService.play(false);
+                    mPlay_image_button.setImageResource(R.drawable.play);
                 }
                 else {
-//                    hostService.setFlag(true);
                     hostService.play(true);
+                    mPlay_image_button.setImageResource(R.drawable.pause);
                 }
-                UIrefresh();
+//                UIrefresh();
             }
         });
 

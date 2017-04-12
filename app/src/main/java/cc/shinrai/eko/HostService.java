@@ -235,7 +235,7 @@ public class HostService extends Service {
         switch (musicSwitchMode) {
             case CYCLE_SWITCH://列表循环
                 int index = musicInfoList.indexOf(mMusicInfo);
-                if(musicInfoList.size() > index) {
+                if(musicInfoList.size() > index + 1) {
                     prepare(musicInfoList.get(index + 1));
                 }
                 else if(!musicInfoList.isEmpty()) {
