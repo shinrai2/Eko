@@ -281,9 +281,7 @@ public class HostActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         //注销广播接收器
-        if (mReceiver != null) {
-            unregisterReceiver(mReceiver);
-        }
+        unregisterReceiver(mReceiver);
         //关闭进度条timer
         if(mTimerTask != null) {
             mTimerTask.cancel();

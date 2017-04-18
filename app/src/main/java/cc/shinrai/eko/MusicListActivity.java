@@ -51,6 +51,7 @@ public class MusicListActivity extends AppCompatActivity {
     private ServiceConnection sc = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
+            Log.i(TAG, "onServiceConnected");
             hostService = ((HostService.MyBinder)service).getService();
             if(hostService.getMusicInfoList() == null) {
                 //在子线程中执行音乐列表读取操作并调用handler
@@ -59,11 +60,18 @@ public class MusicListActivity extends AppCompatActivity {
                     public void run() {
                         MusicLab musicLab = MusicLab.get(MusicListActivity.this, mUIHandler);
                         hostService.setMusicInfoList(musicLab.getMusicInfos());
+                        //更新recyclerview
                         Message message = new Message();
                         message.what = RECYCLERVIEW_REFLESH;
                         mUIHandler.sendMessage(message);
                     }
                 }).start();
+                UIrefresh();
+            }
+            else {
+                Message message = new Message();
+                message.what = RECYCLERVIEW_REFLESH;
+                mUIHandler.sendMessage(message);
                 UIrefresh();
             }
         }
@@ -169,9 +177,13 @@ public class MusicListActivity extends AppCompatActivity {
 
     //更新列表的UI操作
     protected void updateList() {
-        mAdapter = new MusicAdapter(hostService.getMusicInfoList());
-        mMusicRecyclerView.setAdapter(mAdapter);
-        mMusicRecyclerView.addItemDecoration(new RecycleViewDivider(MusicListActivity.this, LinearLayoutManager.HORIZONTAL));
+        if (mAdapter == null) {
+            mAdapter = new MusicAdapter(hostService.getMusicInfoList());
+            mMusicRecyclerView.setAdapter(mAdapter);
+            mMusicRecyclerView.addItemDecoration(new RecycleViewDivider(MusicListActivity.this, LinearLayoutManager.HORIZONTAL));
+        }
+//        mMusicRecyclerView.scrollToPosition(hostService.getCurrentLocation());
+
     }
 
 
@@ -256,9 +268,7 @@ public class MusicListActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        if (mReceiver!=null) {
-            unregisterReceiver(mReceiver);
-        }
+        unregisterReceiver(mReceiver);
         super.onDestroy();
     }
 }

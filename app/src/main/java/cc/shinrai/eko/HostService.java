@@ -33,10 +33,10 @@ public class HostService extends Service {
     private MediaPlayer         mediaPlayer =  new MediaPlayer();
     private MusicInfo           mMusicInfo;
     private Bitmap              mBitmap;
-    private Handler             mHandler;               //在tcp发送歌曲完毕后的handler
+    private Handler             mHandler;                       //在tcp发送歌曲完毕后的handler
     private Boolean             wifi_state = false;
     private List<MusicInfo>     musicInfoList;
-    private int                 musicSwitchMode = CYCLE_SWITCH;//音乐切换模式标记，默认列表循环
+    private int                 musicSwitchMode = CYCLE_SWITCH; //音乐切换模式标记，默认列表循环
 
     public int getMusicSwitchMode() {
         return musicSwitchMode;
