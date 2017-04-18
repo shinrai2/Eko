@@ -38,6 +38,14 @@ public class HostService extends Service {
     private List<MusicInfo>     musicInfoList;
     private int                 musicSwitchMode = CYCLE_SWITCH; //音乐切换模式标记，默认列表循环
 
+    //获取当前歌曲信息的排列位置
+    public int getCurrentMusicPosition() {
+        if (mMusicInfo == null) {
+            return -1;
+        }
+        return musicInfoList.indexOf(mMusicInfo);
+    }
+
     public int getMusicSwitchMode() {
         return musicSwitchMode;
     }
@@ -234,7 +242,7 @@ public class HostService extends Service {
 
         switch (musicSwitchMode) {
             case CYCLE_SWITCH://列表循环
-                int index = musicInfoList.indexOf(mMusicInfo);
+                int index = getCurrentMusicPosition();
                 if(musicInfoList.size() > index + 1) {
                     prepare(musicInfoList.get(index + 1));
                 }

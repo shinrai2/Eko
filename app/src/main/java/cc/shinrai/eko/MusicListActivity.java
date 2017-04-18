@@ -14,6 +14,7 @@ import android.os.Message;
 import android.support.percent.PercentRelativeLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -21,6 +22,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.wangjie.shadowviewhelper.ShadowProperty;
@@ -38,6 +40,7 @@ public class MusicListActivity extends AppCompatActivity {
     private TextView            mMusicTitleOnBar;               //栏的音乐title
     private TextView            mSingerNameOnBar;               //栏的歌手名字
     private PercentRelativeLayout mPercentRelativeLayout;
+    private RelativeLayout      mTopBarLayout;
     private MusicAdapter        mAdapter;
 //    private List<MusicInfo>     musicInfoList;
     private Handler             mUIHandler;                     //启动时音乐读取时显示progressdialog的handler
@@ -107,6 +110,14 @@ public class MusicListActivity extends AppCompatActivity {
                 startActivity(i);
             }
         });
+        mPercentRelativeLayout.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                mMusicRecyclerView.scrollToPosition(hostService.getCurrentMusicPosition());
+                return true;
+            }
+        });
+
 
         mMusicRecyclerView.setLayoutManager(
                 new LinearLayoutManager(MusicListActivity.this));
@@ -181,12 +192,32 @@ public class MusicListActivity extends AppCompatActivity {
             mAdapter = new MusicAdapter(hostService.getMusicInfoList());
             mMusicRecyclerView.setAdapter(mAdapter);
             mMusicRecyclerView.addItemDecoration(new RecycleViewDivider(MusicListActivity.this, LinearLayoutManager.HORIZONTAL));
+//            mMusicRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+//                @Override
+//                public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+//                    super.onScrollStateChanged(recyclerView, newState);
+//                    ControlTopBar();
+//                }
+//            });
+//            ControlTopBar();
         }
-//        mMusicRecyclerView.scrollToPosition(hostService.getCurrentLocation());
-
     }
 
-
+//    private void ControlTopBar() {
+//        LinearLayoutManager layoutManager = (LinearLayoutManager)mMusicRecyclerView.getLayoutManager();
+//        int first   = layoutManager.findFirstVisibleItemPosition();
+//        int last    = layoutManager.findLastVisibleItemPosition();
+//        int current = hostService.getCurrentMusicPosition();
+//        if(current != -1) {
+//            if (current >= first && current <= last) {
+//                //在屏幕内
+//                mTopBarLayout.setVisibility(View.GONE);
+//            } else {
+//                //在屏幕外
+//                mTopBarLayout.setVisibility(View.VISIBLE);
+//            }
+//        }
+//    }
 
     private class MusicHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private TextView mMusicNameTextView;
