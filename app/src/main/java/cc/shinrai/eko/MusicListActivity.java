@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
@@ -40,9 +41,7 @@ public class MusicListActivity extends AppCompatActivity {
     private TextView            mMusicTitleOnBar;               //栏的音乐title
     private TextView            mSingerNameOnBar;               //栏的歌手名字
     private PercentRelativeLayout mPercentRelativeLayout;
-    private RelativeLayout      mTopBarLayout;
     private MusicAdapter        mAdapter;
-//    private List<MusicInfo>     musicInfoList;
     private Handler             mUIHandler;                     //启动时音乐读取时显示progressdialog的handler
     private MusicInfo           mMusicInfo;
     private ImageView           mPicView;
@@ -192,32 +191,8 @@ public class MusicListActivity extends AppCompatActivity {
             mAdapter = new MusicAdapter(hostService.getMusicInfoList());
             mMusicRecyclerView.setAdapter(mAdapter);
             mMusicRecyclerView.addItemDecoration(new RecycleViewDivider(MusicListActivity.this, LinearLayoutManager.HORIZONTAL));
-//            mMusicRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-//                @Override
-//                public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-//                    super.onScrollStateChanged(recyclerView, newState);
-//                    ControlTopBar();
-//                }
-//            });
-//            ControlTopBar();
         }
     }
-
-//    private void ControlTopBar() {
-//        LinearLayoutManager layoutManager = (LinearLayoutManager)mMusicRecyclerView.getLayoutManager();
-//        int first   = layoutManager.findFirstVisibleItemPosition();
-//        int last    = layoutManager.findLastVisibleItemPosition();
-//        int current = hostService.getCurrentMusicPosition();
-//        if(current != -1) {
-//            if (current >= first && current <= last) {
-//                //在屏幕内
-//                mTopBarLayout.setVisibility(View.GONE);
-//            } else {
-//                //在屏幕外
-//                mTopBarLayout.setVisibility(View.VISIBLE);
-//            }
-//        }
-//    }
 
     private class MusicHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private TextView mMusicNameTextView;
@@ -227,9 +202,14 @@ public class MusicListActivity extends AppCompatActivity {
 
         public void bindMusic (MusicInfo m) {
             musicInfo = m;
-            mMusicNameTextView.setText(musicInfo.getMusicName());
             mSingerNameTextView.setText(musicInfo.getSingerName());
             mMusicTimeTextView.setText(formatDurationTime(musicInfo.getDurationTime()));
+            if (musicInfo.isCurrentMusic() == true) {
+                mMusicNameTextView.setText("> - " + musicInfo.getMusicName());
+            }
+            else {
+                mMusicNameTextView.setText(musicInfo.getMusicName());
+            }
         }
 
         //格式化音乐时长的字符串成便于人阅读的时间字符串

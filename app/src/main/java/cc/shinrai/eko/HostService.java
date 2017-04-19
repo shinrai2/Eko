@@ -178,6 +178,7 @@ public class HostService extends Service {
 
     //缓冲音乐并开始播放
     public void prepare(MusicInfo musicInfo) {
+        musicInfo.setCurrentMusic(true);
         if(MusicInfo.equals_(musicInfo, mMusicInfo) == false) {
             mMusicInfo = musicInfo;
             //设置发送文件的路径
@@ -223,6 +224,7 @@ public class HostService extends Service {
         mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
+                mMusicInfo.setCurrentMusic(false);
                 mediaPlayer.seekTo(0);
                 //通知播放下一首歌
                 callNextMusic();

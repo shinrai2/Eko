@@ -8,10 +8,19 @@ import java.io.Serializable;
  */
 
 public class MusicInfo implements Serializable {
-    private String mMusicName;
-    private String mSingerName;
-    private String mDurationTime;
-    private String mPath;
+    private String  mMusicName;
+    private String  mSingerName;
+    private String  mDurationTime;
+    private String  mPath;
+    private boolean isCurrentMusic = false;
+
+    public boolean isCurrentMusic() {
+        return isCurrentMusic;
+    }
+
+    public void setCurrentMusic(boolean currentMusic) {
+        isCurrentMusic = currentMusic;
+    }
 
     //音乐名
     public String getMusicName() {
