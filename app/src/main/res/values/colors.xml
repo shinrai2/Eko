@@ -5,4 +5,6 @@
     <color name="colorPrimaryDiy">#009688</color>
     <color name="colorAccent">#FF4081</color>
     <color name="bar_background">#F5F5F5</color>
+    <color name="colorText">#757575</color>
+    <color name="colorText_red">#EE4000</color>
 </resources>

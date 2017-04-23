@@ -178,8 +178,13 @@ public class HostService extends Service {
 
     //缓冲音乐并开始播放
     public void prepare(MusicInfo musicInfo) {
-        musicInfo.setCurrentMusic(true);
         if(MusicInfo.equals_(musicInfo, mMusicInfo) == false) {
+            //切换现行播放歌曲的标记
+            if(mMusicInfo != null) {
+                mMusicInfo.setCurrentMusic(false);
+            }
+            musicInfo.setCurrentMusic(true);
+
             mMusicInfo = musicInfo;
             //设置发送文件的路径
             mSocketServer.setPath(mMusicInfo.getPath());

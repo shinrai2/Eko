@@ -33,6 +33,7 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.TimeZone;
 
+
 public class MusicListActivity extends AppCompatActivity {
     public static final int     RECYCLERVIEW_REFLESH = 1;
     public static final int     MUSIC_LIST_UPDATE_REFLESH = 2;
@@ -190,25 +191,39 @@ public class MusicListActivity extends AppCompatActivity {
         if (mAdapter == null) {
             mAdapter = new MusicAdapter(hostService.getMusicInfoList());
             mMusicRecyclerView.setAdapter(mAdapter);
-            mMusicRecyclerView.addItemDecoration(new RecycleViewDivider(MusicListActivity.this, LinearLayoutManager.HORIZONTAL));
+//            mMusicRecyclerView.addItemDecoration(new RecycleViewDivider(MusicListActivity.this, LinearLayoutManager.HORIZONTAL));
         }
     }
 
     private class MusicHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        private TextView mMusicNameTextView;
-        private TextView mSingerNameTextView;
-        private TextView mMusicTimeTextView;
-        private MusicInfo musicInfo;
+        private TextView        mMusicNameTextView;
+        private TextView        mSingerNameTextView;
+        private TextView        mMusicTimeTextView;
+        private MusicInfo       musicInfo;
+        private ImageView       isPlaying;
+        private TextView        numberOfMusic;
 
-        public void bindMusic (MusicInfo m) {
+        public void bindMusic (MusicInfo m, int position) {
             musicInfo = m;
+            mMusicNameTextView.setText(musicInfo.getMusicName());
             mSingerNameTextView.setText(musicInfo.getSingerName());
             mMusicTimeTextView.setText(formatDurationTime(musicInfo.getDurationTime()));
-            if (musicInfo.isCurrentMusic() == true) {
-                mMusicNameTextView.setText("> - " + musicInfo.getMusicName());
+            numberOfMusic.setText(((Integer)position).toString());
+            //播放ui调整
+            musicItemRefresh();
+        }
+
+        //调整播放中item的效果显示
+        private void musicItemRefresh() {
+            if(musicInfo.isCurrentMusic()) {
+                isPlaying.setVisibility(View.VISIBLE);
+                numberOfMusic.setVisibility(View.INVISIBLE);
+                mMusicNameTextView.setTextColor(getResources().getColor(R.color.colorText_red));
             }
             else {
-                mMusicNameTextView.setText(musicInfo.getMusicName());
+                isPlaying.setVisibility(View.INVISIBLE);
+                numberOfMusic.setVisibility(View.VISIBLE);
+                mMusicNameTextView.setTextColor(getResources().getColor(R.color.colorText));
             }
         }
 
@@ -223,10 +238,11 @@ public class MusicListActivity extends AppCompatActivity {
 
         public MusicHolder(View itemView) {
             super(itemView);
-
             mMusicNameTextView   = (TextView)itemView.findViewById(R.id.music_name);
             mSingerNameTextView  = (TextView)itemView.findViewById(R.id.singer_name);
             mMusicTimeTextView   = (TextView)itemView.findViewById(R.id.music_time);
+            isPlaying            = (ImageView)itemView.findViewById(R.id.isPlaying);
+            numberOfMusic        = (TextView)itemView.findViewById(R.id.number_of_music);
             itemView.setOnClickListener(this);
         }
 
@@ -237,6 +253,7 @@ public class MusicListActivity extends AppCompatActivity {
             if(mMusicInfo != null) {
                 hostService.prepare(mMusicInfo);
             }
+            musicItemRefresh();
             Intent i = new Intent(MusicListActivity.this, HostActivity.class);
             startActivity(i);
         }
@@ -260,7 +277,7 @@ public class MusicListActivity extends AppCompatActivity {
         @Override
         public void onBindViewHolder(MusicHolder holder, int position) {
             MusicInfo musicInfo = mMusicInfoList.get(position);
-            holder.bindMusic(musicInfo);
+            holder.bindMusic(musicInfo, position);
         }
 
         @Override
@@ -274,6 +291,7 @@ public class MusicListActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             Log.i(TAG, "ContentReceiver");
             UIrefresh();
+            updateList();
         }
     }
 
