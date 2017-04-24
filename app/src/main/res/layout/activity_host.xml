@@ -154,7 +154,7 @@
             android:layout_toStartOf="@+id/play_image_button"/>
 
         <ImageButton
-            android:id="@+id/imageButton4"
+            android:id="@+id/playModeButton"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_alignParentBottom="true"
@@ -165,7 +165,7 @@
             android:cropToPadding="false"
             android:scaleType="centerCrop"
             app:layout_aspectRatio="100%"
-            app:layout_heightPercent="70%"
+            app:layout_heightPercent="58%"
             app:srcCompat="@drawable/list_cycle"
             tools:ignore="ContentDescription,UnusedAttribute"/>
 
