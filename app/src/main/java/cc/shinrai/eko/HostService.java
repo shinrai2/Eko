@@ -46,6 +46,10 @@ public class HostService extends Service {
         return musicInfoList.indexOf(mMusicInfo);
     }
 
+    public int getMusicPosition(MusicInfo musicInfo) {
+        return musicInfoList.indexOf(musicInfo);
+    }
+
     public int getMusicSwitchMode() {
         return musicSwitchMode;
     }
@@ -185,15 +189,17 @@ public class HostService extends Service {
             }
             musicInfo.setCurrentMusic(true);
 
+            final String tmpath = MusicLab.getBasePath() + musicInfo.getPath();
+
             mMusicInfo = musicInfo;
             //设置发送文件的路径
-            mSocketServer.setPath(mMusicInfo.getPath());
+            mSocketServer.setPath(tmpath);
             if(mediaPlayer.isPlaying() == true) {
                 mediaPlayer.pause();
             }
             try {
                 mediaPlayer.reset();//把各项参数恢复到初始状态
-                mediaPlayer.setDataSource(musicInfo.getPath());
+                mediaPlayer.setDataSource(tmpath);
                 mediaPlayer.prepare();  //进行缓冲
             } catch (Exception e) {
                 e.printStackTrace();
@@ -204,7 +210,7 @@ public class HostService extends Service {
                 @Override
                 public void run() {
                     FFmpegMediaMetadataRetriever fmmr = new FFmpegMediaMetadataRetriever();
-                    fmmr.setDataSource(mMusicInfo.getPath());
+                    fmmr.setDataSource(tmpath);
                     byte[] cover_data = fmmr.getEmbeddedPicture();
                     if(cover_data != null) {
                         mBitmap = BitmapFactory.decodeByteArray(cover_data, 0, cover_data.length);

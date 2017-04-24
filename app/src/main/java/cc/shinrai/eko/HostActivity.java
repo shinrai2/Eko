@@ -65,7 +65,7 @@ public class HostActivity extends AppCompatActivity {
                 mTimer.schedule(mTimerTask, 0, 50);
             }
             //刷新UI
-            UIrefresh();
+            UIandDataRefresh();
         }
 
         @Override
@@ -74,8 +74,8 @@ public class HostActivity extends AppCompatActivity {
         }
     };
 
-    //刷新UI界面
-    private void UIrefresh() {
+    //刷新UI界面和数据
+    private void UIandDataRefresh() {
         mMusicInfo = hostService.getMusicInfo();
         if(mMusicInfo != null) {
             mMusicName.setText(mMusicInfo.getMusicName());
@@ -296,7 +296,7 @@ public class HostActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.i(TAG, "ContentReceiver");
-            UIrefresh();
+            UIandDataRefresh();
         }
     }
 }

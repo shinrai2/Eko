@@ -25,8 +25,12 @@ public class MusicLab {
     private List<MusicInfo>     mMusicInfoList;
     private Context             mContext;
     private SQLiteDatabase      mDatabase;
-    private String              basePath = "/storage/sdcard1/netease/cloudmusic/Music/";
+    private static final String basePath = "/storage/sdcard1/netease/cloudmusic/Music/";
     private Handler             mHandler;
+
+    public static String getBasePath() {
+        return basePath;
+    }
 
     private MusicLab(Context context, Handler handler) {
         //从数据库中读取数据
@@ -60,9 +64,8 @@ public class MusicLab {
         for(File file : files) {
             Log.i(TAG, file.getPath());
             if(file.getName().matches(".*\\.mp3$")) {
-                String path = file.getPath();
-//                Log.i(TAG, path);
-                fmmr.setDataSource(path);
+                String path = file.getName();
+                fmmr.setDataSource(basePath + path);
                 String music_name    = fmmr.extractMetadata(
                         FFmpegMediaMetadataRetriever.METADATA_KEY_TITLE);
                 String singer_name   = fmmr.extractMetadata(
