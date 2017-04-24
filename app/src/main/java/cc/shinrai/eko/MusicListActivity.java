@@ -56,11 +56,13 @@ public class MusicListActivity extends AppCompatActivity {
         public void onServiceConnected(ComponentName name, IBinder service) {
             Log.i(TAG, "onServiceConnected");
             hostService = ((HostService.MyBinder)service).getService();
+            //判断hostService是否已存在音乐列表，不存在即开启线程异步获取列表
             if(hostService.getMusicInfoList() == null) {
                 //在子线程中执行音乐列表读取操作并调用handler
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
+                        //耗时操作，读取(首次则扫描)并封装音乐的相关数据
                         MusicLab musicLab = MusicLab.get(MusicListActivity.this, mUIHandler);
                         hostService.setMusicInfoList(musicLab.getMusicInfos());
                         //更新recyclerview
@@ -69,13 +71,15 @@ public class MusicListActivity extends AppCompatActivity {
                         mUIHandler.sendMessage(message);
                     }
                 }).start();
-                UIrefresh();
+                //刷新数据和ui
+                UIandDataRefresh();
             }
             else {
                 Message message = new Message();
                 message.what = RECYCLERVIEW_REFLESH;
                 mUIHandler.sendMessage(message);
-                UIrefresh();
+                //刷新数据和ui
+                UIandDataRefresh();
             }
         }
 
@@ -164,8 +168,8 @@ public class MusicListActivity extends AppCompatActivity {
         super.onStop();
     }
 
-    //刷新UI界面
-    private void UIrefresh() {
+    //刷新UI界面和数据
+    private void UIandDataRefresh() {
         //更新音乐信息
         mMusicInfo       = hostService.getMusicInfo();
         //栏的textview内容更改和栏的可视操作
@@ -191,7 +195,7 @@ public class MusicListActivity extends AppCompatActivity {
         if (mAdapter == null) {
             mAdapter = new MusicAdapter(hostService.getMusicInfoList());
             mMusicRecyclerView.setAdapter(mAdapter);
-//            mMusicRecyclerView.addItemDecoration(new RecycleViewDivider(MusicListActivity.this, LinearLayoutManager.HORIZONTAL));
+            mMusicRecyclerView.addItemDecoration(new RecycleViewDivider(MusicListActivity.this, LinearLayoutManager.HORIZONTAL));
         }
     }
 
@@ -253,7 +257,8 @@ public class MusicListActivity extends AppCompatActivity {
             if(mMusicInfo != null) {
                 hostService.prepare(mMusicInfo);
             }
-            musicItemRefresh();
+            //通知recyclerview更新
+            mAdapter.notifyDataSetChanged();
             Intent i = new Intent(MusicListActivity.this, HostActivity.class);
             startActivity(i);
         }
@@ -290,8 +295,9 @@ public class MusicListActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.i(TAG, "ContentReceiver");
-            UIrefresh();
-            updateList();
+            //刷新数据和ui
+            UIandDataRefresh();
+            mAdapter.notifyDataSetChanged();
         }
     }
 
