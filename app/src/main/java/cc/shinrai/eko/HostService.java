@@ -183,6 +183,8 @@ public class HostService extends Service {
     //缓冲音乐并开始播放
     public void prepare(MusicInfo musicInfo) {
         if(MusicInfo.equals_(musicInfo, mMusicInfo) == false) {
+            //清除上一张图片的缓存
+            mBitmap = null;
             //切换现行播放歌曲的标记
             if(mMusicInfo != null) {
                 mMusicInfo.setCurrentMusic(false);
@@ -205,7 +207,7 @@ public class HostService extends Service {
                 e.printStackTrace();
             }
             play(true);
-            //启动子线程解析音乐图片并发送
+            //启动子线程解析音乐封面并发送通知广播
             new Thread(new Runnable() {
                 @Override
                 public void run() {

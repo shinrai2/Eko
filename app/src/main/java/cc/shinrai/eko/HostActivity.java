@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.Handler;
@@ -19,6 +20,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -32,6 +34,7 @@ import java.util.TimerTask;
 public class HostActivity extends AppCompatActivity {
     public static final String  TAG = "HostActivity";
     public static final int     TIMER_REFRESH = 7;
+    private static final int    radiusOfBlur = 80;
     private boolean             ap_state;           //记录AP状态
     private Button              mWirelessButton;
     private ImageButton         mPlay_image_button;
@@ -47,6 +50,7 @@ public class HostActivity extends AppCompatActivity {
     private Timer               mTimer;             //音乐进度条的timer
     private TimerTask           mTimerTask;         //上述timer对应的timertask
     private Handler             mTimerHandler;      //更改进度条位置的handler
+    private LinearLayout        mParentLinearlayout;
 
     //Service绑定后回调
     private ServiceConnection sc = new ServiceConnection() {
@@ -89,9 +93,26 @@ public class HostActivity extends AppCompatActivity {
             mPlay_image_button.setImageResource(R.drawable.pause);
 
         }
+//        mCoverView.setImageResource(R.drawable.default_cover);
+    }
+
+    private void CoverRefresh() {
         Bitmap bitmap = hostService.getBitmap();
         if(bitmap != null) {
             mCoverView.setImageBitmap(bitmap);
+            //处理blur化的背景图
+            int widthOfParentLinearlayout = mParentLinearlayout.getWidth();
+            int heightOfParentLinearlayout = mParentLinearlayout.getHeight();
+            int heightOfBitmap = bitmap.getHeight();
+            int widthOfBitmap = bitmap.getWidth();
+            int widthOfCut =
+                    (widthOfParentLinearlayout * heightOfBitmap) / heightOfParentLinearlayout;
+            int xTopLeft = (widthOfBitmap - widthOfCut) / 2;
+            int yTopLeft = 0;
+            Bitmap originBackgroundBitmap = Bitmap.createBitmap(bitmap, xTopLeft, yTopLeft, widthOfCut, heightOfBitmap);
+            Bitmap blurBitmap = FastBlurUtil.doBlur(originBackgroundBitmap, radiusOfBlur, true);
+            BitmapDrawable backgroundDrawable = new BitmapDrawable(blurBitmap);
+            mParentLinearlayout.setBackgroundDrawable(backgroundDrawable);
         }
         else {
             mCoverView.setImageResource(R.drawable.default_cover);
@@ -105,15 +126,17 @@ public class HostActivity extends AppCompatActivity {
         setContentView(R.layout.activity_host);
 
         //初始化wifi管理、各种操作的按钮
-        wifiManager      = (WifiManager)getApplicationContext()
+        wifiManager         = (WifiManager)getApplicationContext()
                 .getSystemService(Context.WIFI_SERVICE);
-        mWirelessButton  = (Button)findViewById(R.id.wireless_button);
-        mPlay_image_button = (ImageButton)findViewById(R.id.play_image_button);
-        mFileButton      = (Button)findViewById(R.id.file_button);
-        mMusicName       = (TextView)findViewById(R.id.musicTitle);
-        mSingerName      = (TextView)findViewById(R.id.singerName);
-        mCoverView       = (ImageView)findViewById(R.id.musicCover);
-        mProgressBar     = (ProgressBar)findViewById(R.id.progressBar);
+        mWirelessButton     = (Button)findViewById(R.id.wireless_button);
+        mPlay_image_button  = (ImageButton)findViewById(R.id.play_image_button);
+        mFileButton         = (Button)findViewById(R.id.file_button);
+        mMusicName          = (TextView)findViewById(R.id.musicTitle);
+        mSingerName         = (TextView)findViewById(R.id.singerName);
+        mCoverView          = (ImageView)findViewById(R.id.musicCover);
+        mProgressBar        = (ProgressBar)findViewById(R.id.progressBar);
+        mParentLinearlayout = (LinearLayout)findViewById(R.id.parentLinearlayout);
+//        mParentLinearlayout.measure(0, 0);
         ShadowViewHelper.bindShadowHelper(new ShadowProperty()
                 .setShadowColor(0x77000000)
                 .setShadowDx(3)
@@ -292,11 +315,17 @@ public class HostActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+//        CoverRefresh();
+    }
+
     private class ContentReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.i(TAG, "ContentReceiver");
-            UIandDataRefresh();
+            CoverRefresh();
         }
     }
 }

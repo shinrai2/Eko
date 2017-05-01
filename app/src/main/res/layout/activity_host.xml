@@ -3,6 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/parentLinearlayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -113,45 +114,45 @@
             android:id="@+id/play_image_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
             android:adjustViewBounds="true"
             android:backgroundTint="#00ffffff"
             android:contentDescription=""
             android:cropToPadding="false"
             android:scaleType="fitXY"
             app:srcCompat="@drawable/pause"
-            tools:ignore="ContentDescription,UnusedAttribute"
-            android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true"/>
+            tools:ignore="ContentDescription,UnusedAttribute"/>
 
         <ImageButton
             android:id="@+id/next_image_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/play_image_button"
+            android:layout_toEndOf="@+id/play_image_button"
+            android:layout_toRightOf="@+id/play_image_button"
             android:adjustViewBounds="true"
             android:backgroundTint="#00ffffff"
             android:contentDescription=""
             android:cropToPadding="false"
             android:scaleType="fitXY"
             app:srcCompat="@drawable/navigate_next"
-            tools:ignore="ContentDescription,UnusedAttribute"
-            android:layout_alignTop="@+id/play_image_button"
-            android:layout_toRightOf="@+id/play_image_button"
-            android:layout_toEndOf="@+id/play_image_button"/>
+            tools:ignore="ContentDescription,UnusedAttribute"/>
 
         <ImageButton
             android:id="@+id/before_image_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/play_image_button"
+            android:layout_toLeftOf="@+id/play_image_button"
+            android:layout_toStartOf="@+id/play_image_button"
             android:adjustViewBounds="true"
             android:backgroundTint="#00ffffff"
             android:contentDescription=""
             android:cropToPadding="false"
             android:scaleType="fitXY"
             app:srcCompat="@drawable/navigate_before"
-            tools:ignore="ContentDescription,UnusedAttribute"
-            android:layout_alignTop="@+id/play_image_button"
-            android:layout_toLeftOf="@+id/play_image_button"
-            android:layout_toStartOf="@+id/play_image_button"/>
+            tools:ignore="ContentDescription,UnusedAttribute"/>
 
         <ImageButton
             android:id="@+id/playModeButton"
