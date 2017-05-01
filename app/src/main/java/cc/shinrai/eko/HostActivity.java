@@ -34,6 +34,7 @@ import java.util.TimerTask;
 public class HostActivity extends AppCompatActivity {
     public static final String  TAG = "HostActivity";
     public static final int     TIMER_REFRESH = 7;
+    public static final int     BACKGROUND_REFRESH = 15;
     private static final int    radiusOfBlur = 80;
     private boolean             ap_state;           //记录AP状态
     private Button              mWirelessButton;
@@ -51,6 +52,7 @@ public class HostActivity extends AppCompatActivity {
     private TimerTask           mTimerTask;         //上述timer对应的timertask
     private Handler             mTimerHandler;      //更改进度条位置的handler
     private LinearLayout        mParentLinearlayout;
+    private Handler             mUIHandler;
 
     //Service绑定后回调
     private ServiceConnection sc = new ServiceConnection() {
@@ -97,27 +99,41 @@ public class HostActivity extends AppCompatActivity {
     }
 
     private void CoverRefresh() {
-        Bitmap bitmap = hostService.getBitmap();
+        final Bitmap bitmap = hostService.getBitmap();
         if(bitmap != null) {
+            //设置封面图
             mCoverView.setImageBitmap(bitmap);
-            //处理blur化的背景图
-            int widthOfParentLinearlayout = mParentLinearlayout.getWidth();
-            int heightOfParentLinearlayout = mParentLinearlayout.getHeight();
-            int heightOfBitmap = bitmap.getHeight();
-            int widthOfBitmap = bitmap.getWidth();
-            int widthOfCut =
-                    (widthOfParentLinearlayout * heightOfBitmap) / heightOfParentLinearlayout;
-            int xTopLeft = (widthOfBitmap - widthOfCut) / 2;
-            int yTopLeft = 0;
-            Bitmap originBackgroundBitmap = Bitmap.createBitmap(bitmap, xTopLeft, yTopLeft, widthOfCut, heightOfBitmap);
-            Bitmap blurBitmap = FastBlurUtil.doBlur(originBackgroundBitmap, radiusOfBlur, true);
-            BitmapDrawable backgroundDrawable = new BitmapDrawable(blurBitmap);
-            mParentLinearlayout.setBackgroundDrawable(backgroundDrawable);
+            //开启线程处理耗时操作
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    //处理blur化的背景图
+                    int widthOfParentLinearlayout = mParentLinearlayout.getWidth();
+                    int heightOfParentLinearlayout = mParentLinearlayout.getHeight();
+                    int heightOfBitmap = bitmap.getHeight();
+                    int widthOfBitmap = bitmap.getWidth();
+                    int widthOfCut =
+                            (widthOfParentLinearlayout * heightOfBitmap) / heightOfParentLinearlayout;
+                    int xTopLeft = (widthOfBitmap - widthOfCut) / 2;
+                    int yTopLeft = 0;
+                    Bitmap originBackgroundBitmap = Bitmap.createBitmap(bitmap, xTopLeft, yTopLeft, widthOfCut, heightOfBitmap);
+                    Bitmap blurBitmap = FastBlurUtil.doBlur(originBackgroundBitmap, radiusOfBlur, true);
+                    BitmapDrawable backgroundDrawable = new BitmapDrawable(blurBitmap);
+//                    mParentLinearlayout.setBackgroundDrawable(backgroundDrawable);
+                    Message backgroundRefreshMessage = new Message();
+                    backgroundRefreshMessage.what = BACKGROUND_REFRESH;
+                    backgroundRefreshMessage.obj = backgroundDrawable;
+                    mUIHandler.sendMessage(backgroundRefreshMessage);
+                }
+            }).start();
         }
         else {
+            //设置默认封面图
             mCoverView.setImageResource(R.drawable.default_cover);
         }
     }
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -143,6 +159,20 @@ public class HostActivity extends AppCompatActivity {
                 .setShadowDy(3)
                 .setShadowRadius(5)
         , mCoverView);
+
+        mUIHandler = new Handler() {
+
+            public void handleMessage(Message msg) {
+                switch (msg.what) {
+                    case BACKGROUND_REFRESH:
+                        BitmapDrawable bd = (BitmapDrawable)msg.obj;
+                        mParentLinearlayout.setBackgroundDrawable(bd);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        };
 
         mTimer = new Timer();
         mTimerHandler = new Handler() {
@@ -318,7 +348,7 @@ public class HostActivity extends AppCompatActivity {
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
-//        CoverRefresh();
+        CoverRefresh();
     }
 
     private class ContentReceiver extends BroadcastReceiver {
