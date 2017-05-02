@@ -35,7 +35,7 @@ public class HostActivity extends AppCompatActivity {
     public static final String  TAG = "HostActivity";
     public static final int     TIMER_REFRESH = 7;
     public static final int     BACKGROUND_REFRESH = 15;
-    private static final int    radiusOfBlur = 80;
+    private static final int    radiusOfBlur = 10;
     private boolean             ap_state;           //记录AP状态
     private Button              mWirelessButton;
     private ImageButton         mPlay_image_button;
@@ -110,20 +110,31 @@ public class HostActivity extends AppCompatActivity {
                     //处理blur化的背景图
                     int widthOfParentLinearlayout = mParentLinearlayout.getWidth();
                     int heightOfParentLinearlayout = mParentLinearlayout.getHeight();
+
                     int heightOfBitmap = bitmap.getHeight();
                     int widthOfBitmap = bitmap.getWidth();
-                    int widthOfCut =
-                            (widthOfParentLinearlayout * heightOfBitmap) / heightOfParentLinearlayout;
-                    int xTopLeft = (widthOfBitmap - widthOfCut) / 2;
-                    int yTopLeft = 0;
-                    Bitmap originBackgroundBitmap = Bitmap.createBitmap(bitmap, xTopLeft, yTopLeft, widthOfCut, heightOfBitmap);
-                    Bitmap blurBitmap = FastBlurUtil.doBlur(originBackgroundBitmap, radiusOfBlur, true);
-                    BitmapDrawable backgroundDrawable = new BitmapDrawable(blurBitmap);
-//                    mParentLinearlayout.setBackgroundDrawable(backgroundDrawable);
-                    Message backgroundRefreshMessage = new Message();
-                    backgroundRefreshMessage.what = BACKGROUND_REFRESH;
-                    backgroundRefreshMessage.obj = backgroundDrawable;
-                    mUIHandler.sendMessage(backgroundRefreshMessage);
+
+                    int scaledHeight = heightOfBitmap / 5;
+                    int scaledWidth = widthOfBitmap / 5;
+
+                    try {
+                        Bitmap scaledBitmap = Bitmap.createScaledBitmap(bitmap, scaledHeight, scaledWidth, true);
+                        int widthOfCut =
+                                (widthOfParentLinearlayout * scaledHeight) / heightOfParentLinearlayout;
+                        int xTopLeft = (scaledWidth - widthOfCut) / 2;
+                        int yTopLeft = 0;
+                        Bitmap originBackgroundBitmap = Bitmap.createBitmap(scaledBitmap, xTopLeft, yTopLeft, widthOfCut, scaledHeight);
+                        scaledBitmap.recycle();
+                        Bitmap blurBitmap = FastBlurUtil.doBlur(originBackgroundBitmap, radiusOfBlur, true);
+                        BitmapDrawable backgroundDrawable = new BitmapDrawable(blurBitmap);
+                        Message backgroundRefreshMessage = new Message();
+                        backgroundRefreshMessage.what = BACKGROUND_REFRESH;
+                        backgroundRefreshMessage.obj = backgroundDrawable;
+                        mUIHandler.sendMessage(backgroundRefreshMessage);
+                    }
+                    catch (Exception e) {
+                        Log.i(TAG, e.toString());
+                    }
                 }
             }).start();
         }
