@@ -22,7 +22,8 @@ import wseemann.media.FFmpegMediaMetadataRetriever;
  */
 
 public class HostService extends Service {
-    public static final int     SEND_MESSAGE = 9;
+//    public static final int     SEND_MESSAGE = 9;
+    public static final int     NEW_CONNECT_USER = 11;
     public static final int     CYCLE_SWITCH = 21;
     public static final int     REPEAT_ONE_SWITCH = 23;
     public static final int     SHUFFLE_SWITCH = 27;
@@ -33,11 +34,12 @@ public class HostService extends Service {
 //    private UdpServer           udpServer;
     private UdpClient           mUdpClient;
     private TcpServer           mTcpServer;
+    private Handler             newConnectHandler;
 
     private MediaPlayer         mediaPlayer =  new MediaPlayer();
     private MusicInfo           mMusicInfo;
     private Bitmap              mBitmap;
-    private Handler             mHandler;                       //在tcp发送歌曲完毕后的handler
+//    private Handler             mHandler;                       //在tcp发送歌曲完毕后的handler
     private Boolean             wifi_state = false;
     private List<MusicInfo>     musicInfoList;
     private int                 musicSwitchMode = CYCLE_SWITCH; //音乐切换模式标记，默认列表循环
@@ -100,22 +102,37 @@ public class HostService extends Service {
         return binder;
     }
 
-    public void sendMessage() {
-        Log.i(TAG, "sendMessage");
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Log.i(TAG, "before send.");
-                //构造包含同步消息的字符串
-                String tmpmsg = mMusicInfo.getMusicName() + "-" + mMusicInfo.getDurationTime() +
-                        "-" + mediaPlayer.isPlaying() + "-" + mediaPlayer.getCurrentPosition() +
-                        "-" + new Date().getTime();
-                udpServer.sendMessage(tmpmsg);
-                Log.i(TAG, tmpmsg + " had sent.");
-            }
-        }).start();
-    }
+//    public void sendMessage() {
+//        Log.i(TAG, "sendMessage");
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                Log.i(TAG, "before send.");
+//                //构造包含同步消息的字符串
+//                String msg = mMusicInfo.getMusicName() + "-" + mMusicInfo.getDurationTime() +
+//                        "-" + mediaPlayer.isPlaying() + "-" + mediaPlayer.getCurrentPosition() +
+//                        "-" + new Date().getTime();
+//                udpServer.sendMessage(msg);
+//                Log.i(TAG, msg + " had sent.");
+//            }
+//        }).start();
+//    }
 
+
+    private void tcpSend(String path, String specifyAddress) {
+        String msg = getCurrentMusicPosition() + "-" + getCurrentPosition() +
+                "-" + new Date().getTime() + "-" + (path!=null?"1":"0");
+        List<String> addressList = mUdpClient.getAddressList();
+        if(specifyAddress == null) {
+            for(String address : addressList) {
+                mTcpServer.connect(address, msg, path);
+            }
+        }
+        else {
+            mTcpServer.connect(specifyAddress, msg, path);
+        }
+    }
+    //改变播放状态
     public void play(boolean State) {
         if(State) {
             mediaPlayer.start();
@@ -123,7 +140,8 @@ public class HostService extends Service {
         else {
             mediaPlayer.pause();
         }
-        sendMessage();
+//        sendMessage();
+        tcpSend(null, null);
     }
 
     //获取播放状态 TRUE = 播放 FALSE = 暂停
@@ -142,8 +160,9 @@ public class HostService extends Service {
 
     @Override
     public void onDestroy() {
-        udpServer.closeSocket();
-        mSocketServer.stopSocket();
+//        udpServer.closeSocket();
+//        mSocketServer.stopSocket();
+        mUdpClient.stopReceive();
         Log.i(TAG, "onDestroy");
         super.onDestroy();
     }
@@ -151,38 +170,52 @@ public class HostService extends Service {
     @Override
     public void onCreate() {
         Log.i(TAG, "start.");
-        setListener();
-        mHandler = new Handler() {
-
+        setMusicCompletionListener();
+//        mHandler = new Handler() {
+//
+//            public void handleMessage(Message msg) {
+//                switch (msg.what) {
+//                    case SEND_MESSAGE:
+//                        HostService.this.sendMessage();
+//                        break;
+//                    default:
+//                        break;
+//                }
+//            }
+//        };
+//        onSocketStart();
+        newConnectHandler = new Handler() {
             public void handleMessage(Message msg) {
                 switch (msg.what) {
-                    case SEND_MESSAGE:
-                        HostService.this.sendMessage();
+                    case NEW_CONNECT_USER:
+                        tcpSend(MusicLab.getBasePath() + mMusicInfo.getPath(), (String) msg.obj);
                         break;
                     default:
                         break;
                 }
             }
         };
-        onSocketStart();
+        mUdpClient = new UdpClient(newConnectHandler);
+        mTcpServer = new TcpServer();
+
         super.onCreate();
     }
 
-    public void onSocketStart() {
-        //udp & tcp 启动
-        udpServer = new UdpServer();
-        mSocketServer = new SocketServer(9999, mHandler);
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    mSocketServer.start();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
-    }
+//    public void onSocketStart() {
+//        //udp & tcp 启动
+//        udpServer = new UdpServer();
+//        mSocketServer = new SocketServer(9999, mHandler);
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                try {
+//                    mSocketServer.start();
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }).start();
+//    }
 
     //缓冲音乐并开始播放
     public void prepare(MusicInfo musicInfo) {
@@ -196,10 +229,12 @@ public class HostService extends Service {
             musicInfo.setCurrentMusic(true);
 
             final String tmpath = MusicLab.getBasePath() + musicInfo.getPath();
+            //发送tcp
+            tcpSend(tmpath, null);
 
             mMusicInfo = musicInfo;
             //设置发送文件的路径
-            mSocketServer.setPath(tmpath);
+//            mSocketServer.setPath(tmpath);
             if(mediaPlayer.isPlaying() == true) {
                 mediaPlayer.pause();
             }
@@ -237,7 +272,7 @@ public class HostService extends Service {
     }
 
     //音乐播放完毕后回调
-    private void setListener() {
+    private void setMusicCompletionListener() {
         mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
