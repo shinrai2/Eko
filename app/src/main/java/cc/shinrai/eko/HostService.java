@@ -28,8 +28,12 @@ public class HostService extends Service {
     public static final int     SHUFFLE_SWITCH = 27;
     public static final String  UIREFRESH_PRIVATE = "cc.shinrai.eko.UIREFRESH_PRIVATE";
     private static final String TAG = "HostService";
-    private SocketServer        mSocketServer;
-    private UdpServer           udpServer;
+
+//    private SocketServer        mSocketServer;
+//    private UdpServer           udpServer;
+    private UdpClient           mUdpClient;
+    private TcpServer           mTcpServer;
+
     private MediaPlayer         mediaPlayer =  new MediaPlayer();
     private MusicInfo           mMusicInfo;
     private Bitmap              mBitmap;
@@ -45,23 +49,23 @@ public class HostService extends Service {
         }
         return musicInfoList.indexOf(mMusicInfo);
     }
-
+    //获取指定音乐信息的目录位置
     public int getMusicPosition(MusicInfo musicInfo) {
         return musicInfoList.indexOf(musicInfo);
     }
-
+    //获取音乐切换模式
     public int getMusicSwitchMode() {
         return musicSwitchMode;
     }
-
+    //设定音乐切换模式
     public void setMusicSwitchMode(int musicSwitchMode) {
         this.musicSwitchMode = musicSwitchMode;
     }
-
+    //获取音乐列表
     public List<MusicInfo> getMusicInfoList() {
         return musicInfoList;
     }
-
+    //设定音乐列表
     public void setMusicInfoList(List<MusicInfo> musicInfoList) {
         this.musicInfoList = musicInfoList;
     }
