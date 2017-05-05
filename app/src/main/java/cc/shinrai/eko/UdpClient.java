@@ -1,11 +1,7 @@
 package cc.shinrai.eko;
 
-import android.app.IntentService;
-import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
-import android.support.annotation.Nullable;
-import android.util.Log;
 
 import java.net.DatagramPacket;
 import java.net.InetAddress;
@@ -22,7 +18,7 @@ import java.util.regex.Pattern;
 public class UdpClient {
     private static final String TAG = "UdpClient";
     private static final String _multicastHost = "224.0.0.1";
-    private static final String _regex = "k((?:[0-9]+\\.){3}[0-9]+)";   //format like 'k192.168.199.1'
+    private static final String _regex = "k((?:[0-9]{1,3}\\.){3}[0-9]{1,3})";   //format like 'k192.168.199.1'
     private MulticastSocket     multicastSocket;
     private InetAddress         receiveAddress;
     private boolean             isStopReceive = false;
@@ -30,8 +26,9 @@ public class UdpClient {
     private Handler             newConnectHandler;
 
     public UdpClient(Handler handler) {
-        addressList = new ArrayList<>();
-        newConnectHandler = handler;
+        //Init list.
+        this.addressList = new ArrayList<>();
+        this.newConnectHandler = handler;
     }
 
     /**
@@ -77,6 +74,7 @@ public class UdpClient {
         Pattern p = Pattern.compile(regex);
         Matcher m = p.matcher(string);
         if (m.find()) {
+            return m.group(1).toString();
         }
         return null;
     }
@@ -93,7 +91,7 @@ public class UdpClient {
         }
     }
     //tcp发送失败时，删除记录
-    private void deleteAddress(String address) {
+    public void deleteAddress(String address) {
         if(addressList.contains(address)) {
             addressList.remove(address);
         }

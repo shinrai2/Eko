@@ -24,6 +24,7 @@ import wseemann.media.FFmpegMediaMetadataRetriever;
 public class HostService extends Service {
 //    public static final int     SEND_MESSAGE = 9;
     public static final int     NEW_CONNECT_USER = 11;
+    public static final int     DISCONNECT_USER = 13;
     public static final int     CYCLE_SWITCH = 21;
     public static final int     REPEAT_ONE_SWITCH = 23;
     public static final int     SHUFFLE_SWITCH = 27;
@@ -34,7 +35,7 @@ public class HostService extends Service {
 //    private UdpServer           udpServer;
     private UdpClient           mUdpClient;
     private TcpServer           mTcpServer;
-    private Handler             newConnectHandler;
+    private Handler             ConnectHandler;
 
     private MediaPlayer         mediaPlayer =  new MediaPlayer();
     private MusicInfo           mMusicInfo;
@@ -118,7 +119,11 @@ public class HostService extends Service {
 //        }).start();
 //    }
 
-
+    /**
+     * send data and file by tcp.
+     * @param path path of file.null means only data.
+     * @param specifyAddress send the data and file to a specify address.null means send to all addresses.
+     */
     private void tcpSend(String path, String specifyAddress) {
         String msg = getCurrentMusicPosition() + "-" + getCurrentPosition() +
                 "-" + new Date().getTime() + "-" + (path!=null?"1":"0");
@@ -184,19 +189,21 @@ public class HostService extends Service {
 //            }
 //        };
 //        onSocketStart();
-        newConnectHandler = new Handler() {
+        ConnectHandler = new Handler() {
             public void handleMessage(Message msg) {
                 switch (msg.what) {
                     case NEW_CONNECT_USER:
                         tcpSend(MusicLab.getBasePath() + mMusicInfo.getPath(), (String) msg.obj);
                         break;
+                    case DISCONNECT_USER:
+                        mUdpClient.deleteAddress((String) msg.obj);
                     default:
                         break;
                 }
             }
         };
-        mUdpClient = new UdpClient(newConnectHandler);
-        mTcpServer = new TcpServer();
+        mUdpClient = new UdpClient(ConnectHandler);
+        mTcpServer = new TcpServer(ConnectHandler);
 
         super.onCreate();
     }
