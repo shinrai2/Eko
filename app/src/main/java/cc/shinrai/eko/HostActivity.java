@@ -366,6 +366,7 @@ public class HostActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.i(TAG, "ContentReceiver");
+            UIandDataRefresh();
             CoverRefresh();
         }
     }
