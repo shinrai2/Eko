@@ -35,7 +35,7 @@ public class HostActivity extends AppCompatActivity {
     public static final String  TAG = "HostActivity";
     public static final int     TIMER_REFRESH = 7;
     public static final int     BACKGROUND_REFRESH = 15;
-    private static final int    radiusOfBlur = 10;
+    private static final int    radiusOfBlur = 10;  //blur特效的半径
     private boolean             ap_state;           //记录AP状态
     private Button              mWirelessButton;
     private ImageButton         mPlay_image_button;

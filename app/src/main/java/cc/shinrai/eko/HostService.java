@@ -125,6 +125,7 @@ public class HostService extends Service {
      * @param specifyAddress send the data and file to a specify address.null means send to all addresses.
      */
     private void tcpSend(String path, String specifyAddress) {
+        Log.i(TAG, "path : " + path + " specifyAddress : " + specifyAddress);
         String msg = getCurrentMusicPosition() + "-" + getCurrentPosition() +
                 "-" + new Date().getTime() + "-" + (path!=null?"1":"0");
         List<String> addressList = mUdpClient.getAddressList();
@@ -137,7 +138,7 @@ public class HostService extends Service {
             mTcpServer.connect(specifyAddress, msg, path);
         }
     }
-    //改变播放状态
+    //改变播放状态(操作用)
     public void play(boolean State) {
         if(State) {
             mediaPlayer.start();
@@ -204,7 +205,7 @@ public class HostService extends Service {
         };
         mUdpClient = new UdpClient(ConnectHandler);
         mTcpServer = new TcpServer(ConnectHandler);
-
+        mUdpClient.receive();
         super.onCreate();
     }
 
@@ -252,7 +253,7 @@ public class HostService extends Service {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            play(true);
+            mediaPlayer.start();
             //启动子线程解析音乐封面并发送通知广播
             new Thread(new Runnable() {
                 @Override
@@ -273,7 +274,7 @@ public class HostService extends Service {
         }
         else {
             if(mediaPlayer.isPlaying() == false) {
-                play(true);
+                mediaPlayer.start();
             }
         }
     }
@@ -312,7 +313,7 @@ public class HostService extends Service {
                 }
                 break;
             case REPEAT_ONE_SWITCH://单一循环
-                play(true);
+                mediaPlayer.start();
                 break;
             case SHUFFLE_SWITCH://随机循环
                 break;

@@ -4,9 +4,11 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
+import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
 
@@ -31,11 +33,13 @@ public class TcpServer {
                     Socket socket = new Socket(address, 9999);
                     OutputStream outStream = socket.getOutputStream();
                     //发送信息头
-                    outStream.write(head.getBytes());
+                    String xhead = head + "\n";
+                    outStream.write(xhead.getBytes());
+                    outStream.flush();
+                    Log.i(TAG, xhead);
                     //等待feedback
-                    InputStream inStream = socket.getInputStream();
-                    DataInputStream dataInStream = new DataInputStream(inStream);
-                    String feedbackString = new String(dataInStream.readUTF());
+                    BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                    String feedbackString = br.readLine();
                     //处理反馈信息
                     Log.i(TAG, feedbackString);
                     //判断状态 & 等待发送文件
@@ -46,12 +50,13 @@ public class TcpServer {
                         while ((wtemp = fileinputStream.read(writebuffer)) != -1) {
                             outStream.write(writebuffer, 0, wtemp);
                         }
+                        Log.i(TAG, "file sent.");
                         outStream.flush();
                         fileinputStream.close();
                     }
                     //ensure the stream is closed.
-                    inStream.close();
                     outStream.close();
+                    socket.close();
                 }
                 catch (Exception e) {
                     e.printStackTrace();

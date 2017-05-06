@@ -2,6 +2,7 @@ package cc.shinrai.eko;
 
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 
 import java.net.DatagramPacket;
 import java.net.InetAddress;
@@ -45,10 +46,11 @@ public class UdpClient {
                 public void run() {
                     byte buf[] = new byte[1024];
                     DatagramPacket dp = new DatagramPacket(buf, 1024);
-                    while (isStopReceive) {
+                    while (!isStopReceive) {
                         try {
                             multicastSocket.receive(dp);
                             String info = new String(buf, 0, dp.getLength());
+                            Log.i(TAG, info);
                             //解析并添加到列表中
                             addAddress(parseRegexString(info, _regex));
                         } catch (Exception e) {
