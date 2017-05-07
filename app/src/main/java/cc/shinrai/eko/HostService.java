@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.media.MediaPlayer;
 import android.os.Binder;
 import android.os.Handler;
@@ -22,29 +23,33 @@ import wseemann.media.FFmpegMediaMetadataRetriever;
  */
 
 public class HostService extends Service {
-//    public static final int     SEND_MESSAGE = 9;
-    public static final int     NEW_CONNECT_USER = 11;
-    public static final int     DISCONNECT_USER = 13;
-    public static final int     CYCLE_SWITCH = 21;
-    public static final int     REPEAT_ONE_SWITCH = 23;
-    public static final int     SHUFFLE_SWITCH = 27;
-    public static final String  UIREFRESH_PRIVATE = "cc.shinrai.eko.UIREFRESH_PRIVATE";
+    public static final int     NEW_CONNECT_USER    = 11;
+    public static final int     DISCONNECT_USER     = 13;
+    public static final int     CYCLE_SWITCH        = 21;
+    public static final int     REPEAT_ONE_SWITCH   = 23;
+    public static final int     SHUFFLE_SWITCH      = 27;
+    public static final String  UIREFRESH_PRIVATE   = "cc.shinrai.eko.UIREFRESH_PRIVATE";
     private static final String TAG = "HostService";
-
-//    private SocketServer        mSocketServer;
-//    private UdpServer           udpServer;
     private UdpClient           mUdpClient;
     private TcpServer           mTcpServer;
     private Handler             ConnectHandler;
 
-    private MediaPlayer         mediaPlayer =  new MediaPlayer();
+    private MediaPlayer         mediaPlayer         = new MediaPlayer();
     private MusicInfo           mMusicInfo;
     private Bitmap              mBitmap;
-//    private Handler             mHandler;                       //在tcp发送歌曲完毕后的handler
-    private Boolean             wifi_state = false;
+    private Boolean             wifi_state          = false;
     private List<MusicInfo>     musicInfoList;
-    private int                 musicSwitchMode = CYCLE_SWITCH; //音乐切换模式标记，默认列表循环
+    private int                 musicSwitchMode     = CYCLE_SWITCH; //音乐切换模式标记，默认列表循环
+    private BitmapDrawable      blurBackgroundImage = null;
 
+    //记录经过处理的背景图片对象
+    public void setBlurBackgroundImage(BitmapDrawable bitmapDrawable) {
+        blurBackgroundImage = bitmapDrawable;
+    }
+    //获取背景图片对象
+    public BitmapDrawable getBlurBackgroundImage() {
+        return blurBackgroundImage;
+    }
     //获取当前歌曲信息的排列位置
     public int getCurrentMusicPosition() {
         if (mMusicInfo == null) {
@@ -230,6 +235,7 @@ public class HostService extends Service {
         if(MusicInfo.equals_(musicInfo, mMusicInfo) == false) {
             //清除上一张图片的缓存
             mBitmap = null;
+            blurBackgroundImage = null;
             //切换现行播放歌曲的标记
             if(mMusicInfo != null) {
                 mMusicInfo.setCurrentMusic(false);

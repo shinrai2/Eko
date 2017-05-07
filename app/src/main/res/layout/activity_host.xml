@@ -20,6 +20,7 @@
         android:layout_height="0dp"
         android:layout_weight="13"
         android:clickable="true"
+        android:fitsSystemWindows="true"
         >
 
         <ImageView
@@ -35,48 +36,49 @@
             app:layout_widthPercent="100%"
             tools:ignore="UnusedAttribute"/>
 
-        <TextView
-            android:id="@+id/musicTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/musicCover"
-            android:layout_centerHorizontal="true"
-            android:layout_gravity="center_horizontal"
-            android:layout_margin="@dimen/default_margin"
-            android:ellipsize="marquee"
-            android:lines="1"
-            android:text="@string/music_name"
-            android:textSize="20sp"/>
-
-        <TextView
-            android:id="@+id/singerName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/musicTitle"
-            android:layout_centerHorizontal="true"
-            android:layout_gravity="center_horizontal"
-            android:layout_margin="@dimen/default_margin"
-            android:ellipsize="marquee"
-            android:lines="1"
-            android:text="@string/singer_name"
-            android:textSize="14sp"/>
-
-        <RelativeLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@+id/singerName">
+            android:layout_below="@+id/musicCover"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/musicTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_margin="@dimen/default_margin"
+                android:layout_weight="1"
+                android:ellipsize="marquee"
+                android:gravity="center_vertical"
+                android:lines="1"
+                android:text="@string/music_name"
+                android:textSize="22sp"
+                />
+
+            <TextView
+                android:id="@+id/singerName"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_margin="@dimen/default_margin"
+                android:layout_weight="1"
+                android:ellipsize="marquee"
+                android:gravity="center_vertical"
+                android:lines="1"
+                android:text="@string/singer_name"
+                android:textSize="14sp"
+                />
 
             <ProgressBar
                 android:id="@+id/progressBar"
                 style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:layout_centerVertical="true"
+                android:layout_height="0dp"
+                android:layout_weight="1"
                 android:max="100"
                 android:progress="0"/>
-        </RelativeLayout>
+        </LinearLayout>
 
     </android.support.percent.PercentRelativeLayout>
 

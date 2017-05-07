@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import java.net.DatagramPacket;
@@ -14,16 +15,16 @@ import java.net.MulticastSocket;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Button mHostButton;
-    private Button mGuestButton;
+    private ImageButton mHostButton;
+    private ImageButton mGuestButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mHostButton = (Button) findViewById(R.id.host);
-        mGuestButton = (Button) findViewById(R.id.guset);
+        mHostButton = (ImageButton) findViewById(R.id.hostButton);
+        mGuestButton = (ImageButton) findViewById(R.id.gusetButton);
         mHostButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

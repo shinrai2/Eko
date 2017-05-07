@@ -10,6 +10,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
@@ -17,6 +18,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -107,34 +109,42 @@ public class HostActivity extends AppCompatActivity {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    //处理blur化的背景图
-                    int widthOfParentLinearlayout = mParentLinearlayout.getWidth();
-                    int heightOfParentLinearlayout = mParentLinearlayout.getHeight();
+                    BitmapDrawable backgroundDrawable;
+                    if(hostService.getBlurBackgroundImage() == null) {
+                        //处理blur化的背景图
+                        int widthOfParentLinearlayout = mParentLinearlayout.getWidth();
+                        int heightOfParentLinearlayout = mParentLinearlayout.getHeight();
 
-                    int heightOfBitmap = bitmap.getHeight();
-                    int widthOfBitmap = bitmap.getWidth();
+                        int heightOfBitmap = bitmap.getHeight();
+                        int widthOfBitmap = bitmap.getWidth();
 
-                    int scaledHeight = heightOfBitmap / 5;
-                    int scaledWidth = widthOfBitmap / 5;
+                        int scaledHeight = heightOfBitmap / 5;
+                        int scaledWidth = widthOfBitmap / 5;
 
-                    try {
-                        Bitmap scaledBitmap = Bitmap.createScaledBitmap(bitmap, scaledHeight, scaledWidth, true);
-                        int widthOfCut =
-                                (widthOfParentLinearlayout * scaledHeight) / heightOfParentLinearlayout;
-                        int xTopLeft = (scaledWidth - widthOfCut) / 2;
-                        int yTopLeft = 0;
-                        Bitmap originBackgroundBitmap = Bitmap.createBitmap(scaledBitmap, xTopLeft, yTopLeft, widthOfCut, scaledHeight);
-                        scaledBitmap.recycle();
-                        Bitmap blurBitmap = FastBlurUtil.doBlur(originBackgroundBitmap, radiusOfBlur, true);
-                        BitmapDrawable backgroundDrawable = new BitmapDrawable(blurBitmap);
-                        Message backgroundRefreshMessage = new Message();
-                        backgroundRefreshMessage.what = BACKGROUND_REFRESH;
-                        backgroundRefreshMessage.obj = backgroundDrawable;
-                        mUIHandler.sendMessage(backgroundRefreshMessage);
+                        try {
+                            Bitmap scaledBitmap = Bitmap.createScaledBitmap(bitmap, scaledHeight, scaledWidth, true);
+                            int widthOfCut =
+                                    (widthOfParentLinearlayout * scaledHeight) / heightOfParentLinearlayout;
+                            int xTopLeft = (scaledWidth - widthOfCut) / 2;
+                            int yTopLeft = 0;
+                            Bitmap originBackgroundBitmap = Bitmap.createBitmap(scaledBitmap, xTopLeft, yTopLeft, widthOfCut, scaledHeight);
+                            scaledBitmap.recycle();
+                            Bitmap blurBitmap = FastBlurUtil.doBlur(originBackgroundBitmap, radiusOfBlur, true);
+                            backgroundDrawable = new BitmapDrawable(blurBitmap);
+                            //将对象记录到service中
+                            hostService.setBlurBackgroundImage(backgroundDrawable);
+                        } catch (Exception e) {
+                            Log.i(TAG, e.toString());
+                            backgroundDrawable = null;
+                        }
                     }
-                    catch (Exception e) {
-                        Log.i(TAG, e.toString());
+                    else {
+                        backgroundDrawable = hostService.getBlurBackgroundImage();
                     }
+                    Message backgroundRefreshMessage = new Message();
+                    backgroundRefreshMessage.what = BACKGROUND_REFRESH;
+                    backgroundRefreshMessage.obj = backgroundDrawable;
+                    mUIHandler.sendMessage(backgroundRefreshMessage);
                 }
             }).start();
         }
@@ -150,6 +160,7 @@ public class HostActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 //        getSupportActionBar().hide();
+        initState();
         setContentView(R.layout.activity_host);
 
         //初始化wifi管理、各种操作的按钮
@@ -368,6 +379,18 @@ public class HostActivity extends AppCompatActivity {
             Log.i(TAG, "ContentReceiver");
             UIandDataRefresh();
             CoverRefresh();
+        }
+    }
+
+    /**
+     * 沉浸式状态栏
+     */
+    private void initState() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            //透明状态栏
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            //透明导航栏
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
         }
     }
 }
