@@ -8,12 +8,29 @@
     android:orientation="vertical"
     tools:context="cc.shinrai.eko.MusicListActivity">
 
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fitsSystemWindows="true"
+        android:background="@color/colorPrimaryDiy">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimaryDiy"
+            android:padding="@dimen/title_padding"
+            android:text="@string/music_list"
+            android:textColor="@android:color/white"
+            android:textSize="24sp"/>
+    </RelativeLayout>
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/music_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         tools:listitem="@layout/music_list_item"
         android:layout_weight="6"
+        android:background="@color/default_background"
         />
 
     <android.support.percent.PercentRelativeLayout
@@ -24,7 +41,6 @@
         android:background="@color/bar_background"
         android:elevation="12dp"
         android:orientation="horizontal"
-        android:visibility="gone"
         tools:ignore="UnusedAttribute">
 
         <RelativeLayout

@@ -11,4 +11,6 @@
     <string name="singer_name">Singer Name</string>
     <string name="music_title_bar">Music Title</string>
     <string name="singer_name_bar">Singer Name</string>
+    <string name="music_list">Music list</string>
+    <string name="function">Function</string>
 </resources>

@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
@@ -34,10 +35,10 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class HostActivity extends AppCompatActivity {
-    public static final String  TAG = "HostActivity";
-    public static final int     TIMER_REFRESH = 7;
-    public static final int     BACKGROUND_REFRESH = 15;
-    private static final int    radiusOfBlur = 10;  //blur特效的半径
+    public static final String  TAG                 = "HostActivity";
+    public static final int     TIMER_REFRESH       = 7;
+    public static final int     BACKGROUND_REFRESH  = 15;
+    private static final int    radiusOfBlur        = 15;  //blur特效的半径
     private boolean             ap_state;           //记录AP状态
     private Button              mWirelessButton;
     private ImageButton         mPlay_image_button;
@@ -90,6 +91,20 @@ public class HostActivity extends AppCompatActivity {
             mSingerName.setText(mMusicInfo.getSingerName());
             mProgressBar.setMax(Integer.parseInt(mMusicInfo.getDurationTime()));
         }
+        Bitmap bitmap = hostService.getBitmap();
+        BitmapDrawable backgroundDrawable = hostService.getBlurBackgroundImage();
+        if(bitmap != null) { //设置封面 ( null 则设置为默认封面)
+            mCoverView.setImageBitmap(bitmap);
+        }
+        else {
+            mCoverView.setImageResource(R.drawable.default_cover);
+        }
+        if(backgroundDrawable != null) { //设置背景 ( null 则设置为默认背景)
+            mParentLinearlayout.setBackgroundDrawable(backgroundDrawable);
+        }
+        else {
+            mParentLinearlayout.setBackgroundResource(R.drawable.alpha_45_dark);
+        }
         if(hostService.isPlaying() == false) {
             mPlay_image_button.setImageResource(R.drawable.play);
         }
@@ -97,20 +112,20 @@ public class HostActivity extends AppCompatActivity {
             mPlay_image_button.setImageResource(R.drawable.pause);
 
         }
-//        mCoverView.setImageResource(R.drawable.default_cover);
     }
 
-    private void CoverRefresh() {
+    /**
+     * 当 hostService 中的背景对象被置空，重新运算计算出背景图，设置背景图并记录至 hostService
+     */
+    private void BackgroundRefresh() {
         final Bitmap bitmap = hostService.getBitmap();
-        if(bitmap != null) {
-            //设置封面图
-            mCoverView.setImageBitmap(bitmap);
-            //开启线程处理耗时操作
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    BitmapDrawable backgroundDrawable;
-                    if(hostService.getBlurBackgroundImage() == null) {
+        if(hostService.getBlurBackgroundImage() == null) {
+            if(bitmap != null) {
+                //开启线程处理耗时操作
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        BitmapDrawable backgroundDrawable;
                         //处理blur化的背景图
                         int widthOfParentLinearlayout = mParentLinearlayout.getWidth();
                         int heightOfParentLinearlayout = mParentLinearlayout.getHeight();
@@ -118,8 +133,8 @@ public class HostActivity extends AppCompatActivity {
                         int heightOfBitmap = bitmap.getHeight();
                         int widthOfBitmap = bitmap.getWidth();
 
-                        int scaledHeight = heightOfBitmap / 5;
-                        int scaledWidth = widthOfBitmap / 5;
+                        int scaledHeight = heightOfBitmap / 6;
+                        int scaledWidth = widthOfBitmap / 6;
 
                         try {
                             Bitmap scaledBitmap = Bitmap.createScaledBitmap(bitmap, scaledHeight, scaledWidth, true);
@@ -137,24 +152,15 @@ public class HostActivity extends AppCompatActivity {
                             Log.i(TAG, e.toString());
                             backgroundDrawable = null;
                         }
+                        Message backgroundRefreshMessage = new Message();
+                        backgroundRefreshMessage.what = BACKGROUND_REFRESH;
+                        backgroundRefreshMessage.obj = backgroundDrawable;
+                        mUIHandler.sendMessage(backgroundRefreshMessage);
                     }
-                    else {
-                        backgroundDrawable = hostService.getBlurBackgroundImage();
-                    }
-                    Message backgroundRefreshMessage = new Message();
-                    backgroundRefreshMessage.what = BACKGROUND_REFRESH;
-                    backgroundRefreshMessage.obj = backgroundDrawable;
-                    mUIHandler.sendMessage(backgroundRefreshMessage);
-                }
-            }).start();
-        }
-        else {
-            //设置默认封面图
-            mCoverView.setImageResource(R.drawable.default_cover);
+                }).start();
+            }
         }
     }
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -166,13 +172,13 @@ public class HostActivity extends AppCompatActivity {
         //初始化wifi管理、各种操作的按钮
         wifiManager         = (WifiManager)getApplicationContext()
                 .getSystemService(Context.WIFI_SERVICE);
-        mWirelessButton     = (Button)findViewById(R.id.wireless_button);
-        mPlay_image_button  = (ImageButton)findViewById(R.id.play_image_button);
-        mFileButton         = (Button)findViewById(R.id.file_button);
-        mMusicName          = (TextView)findViewById(R.id.musicTitle);
-        mSingerName         = (TextView)findViewById(R.id.singerName);
-        mCoverView          = (ImageView)findViewById(R.id.musicCover);
-        mProgressBar        = (ProgressBar)findViewById(R.id.progressBar);
+        mWirelessButton     = (Button)      findViewById(R.id.wireless_button);
+        mPlay_image_button  = (ImageButton) findViewById(R.id.play_image_button);
+        mFileButton         = (Button)      findViewById(R.id.file_button);
+        mMusicName          = (TextView)    findViewById(R.id.musicTitle);
+        mSingerName         = (TextView)    findViewById(R.id.singerName);
+        mCoverView          = (ImageView)   findViewById(R.id.musicCover);
+        mProgressBar        = (ProgressBar) findViewById(R.id.progressBar);
         mParentLinearlayout = (LinearLayout)findViewById(R.id.parentLinearlayout);
 //        mParentLinearlayout.measure(0, 0);
         ShadowViewHelper.bindShadowHelper(new ShadowProperty()
@@ -259,7 +265,6 @@ public class HostActivity extends AppCompatActivity {
                     hostService.play(true);
                     mPlay_image_button.setImageResource(R.drawable.pause);
                 }
-//                UIrefresh();
             }
         });
 
@@ -367,18 +372,14 @@ public class HostActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
-    @Override
-    public void onWindowFocusChanged(boolean hasFocus) {
-        super.onWindowFocusChanged(hasFocus);
-        CoverRefresh();
-    }
-
     private class ContentReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.i(TAG, "ContentReceiver");
-            UIandDataRefresh();
-            CoverRefresh();
+            if(hostService != null) {
+                UIandDataRefresh();
+                BackgroundRefresh();
+            }
         }
     }
 

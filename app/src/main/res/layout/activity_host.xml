@@ -11,7 +11,11 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="cc.shinrai.eko.HostActivity">
+    android:background="@drawable/alpha_45_dark"
+    android:backgroundTint="@color/backgroundTintColor"
+    android:backgroundTintMode="multiply"
+    tools:context="cc.shinrai.eko.HostActivity"
+    tools:targetApi="lollipop">
 
     <android.support.percent.PercentRelativeLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
@@ -48,12 +52,13 @@
                 android:layout_height="0dp"
                 android:layout_gravity="center_horizontal"
                 android:layout_margin="@dimen/default_margin"
-                android:layout_weight="1"
+                android:layout_weight="0.9"
                 android:ellipsize="marquee"
                 android:gravity="center_vertical"
                 android:lines="1"
                 android:text="@string/music_name"
-                android:textSize="22sp"
+                android:textSize="24sp"
+                android:textColor="@color/colorText_white"
                 />
 
             <TextView
@@ -62,22 +67,52 @@
                 android:layout_height="0dp"
                 android:layout_gravity="center_horizontal"
                 android:layout_margin="@dimen/default_margin"
-                android:layout_weight="1"
+                android:layout_weight="0.9"
                 android:ellipsize="marquee"
                 android:gravity="center_vertical"
                 android:lines="1"
                 android:text="@string/singer_name"
-                android:textSize="14sp"
+                android:textSize="16sp"
+                android:textColor="@color/colorText_light_gray"
                 />
 
-            <ProgressBar
-                android:id="@+id/progressBar"
-                style="?android:attr/progressBarStyleHorizontal"
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="1"
-                android:max="100"
-                android:progress="0"/>
+                android:layout_weight="1.2">
+
+                <ProgressBar
+                    android:id="@+id/progressBar"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:max="100"
+                    android:progress="0"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"/>
+
+                <TextView
+                    android:id="@+id/duringTimeTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_below="@+id/progressBar"
+                    android:text="4:00"
+                    android:textColor="@color/colorText_white"/>
+
+                <TextView
+                    android:id="@+id/lastTimeTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_below="@+id/progressBar"
+                    android:text="-1:25"
+                    android:textColor="@color/colorText_white"/>
+            </RelativeLayout>
+
         </LinearLayout>
 
     </android.support.percent.PercentRelativeLayout>

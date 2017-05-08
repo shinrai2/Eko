@@ -17,12 +17,12 @@ import java.util.regex.Pattern;
  */
 
 public class UdpClient {
-    private static final String TAG = "UdpClient";
-    private static final String _multicastHost = "224.0.0.1";
-    private static final String _regex = "k((?:[0-9]{1,3}\\.){3}[0-9]{1,3})";   //format like 'k192.168.199.1'
+    private static final String TAG             = "UdpClient";
+    private static final String _multicastHost  = "224.0.0.1";
+    private static final String _regex          = "k((?:[0-9]{1,3}\\.){3}[0-9]{1,3})";//format like 'k192.168.199.1'
     private MulticastSocket     multicastSocket;
     private InetAddress         receiveAddress;
-    private boolean             isStopReceive = false;
+    private boolean             isStopReceive   = false;
     private List<String>        addressList;
     private Handler             newConnectHandler;
 

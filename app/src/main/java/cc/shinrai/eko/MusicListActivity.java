@@ -9,6 +9,7 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
@@ -22,6 +23,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -35,9 +37,9 @@ import java.util.TimeZone;
 
 
 public class MusicListActivity extends AppCompatActivity {
-    public static final int     RECYCLERVIEW_REFLESH = 1;
-    public static final int     MUSIC_LIST_UPDATE_REFLESH = 2;
-    private static final String TAG = "MusicListActivity";
+    public static final int     RECYCLERVIEW_REFLESH        = 1;
+    public static final int     MUSIC_LIST_UPDATE_REFLESH   = 2;
+    private static final String TAG                         = "MusicListActivity";
     private RecyclerView        mMusicRecyclerView;
     private TextView            mMusicTitleOnBar;               //栏的音乐title
     private TextView            mSingerNameOnBar;               //栏的歌手名字
@@ -93,6 +95,7 @@ public class MusicListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 //        getSupportActionBar().hide();
+        initState();
         setContentView(R.layout.activity_music_list);
 
         mMusicRecyclerView = (RecyclerView)findViewById(R.id.music_recycler_view);
@@ -156,9 +159,9 @@ public class MusicListActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         //启动后台服务
-        Intent tmpIntent = HostService.newIntent(MusicListActivity.this);
-        startService(tmpIntent);
-        bindService(tmpIntent, sc, MusicListActivity.BIND_AUTO_CREATE);
+        Intent intent = HostService.newIntent(MusicListActivity.this);
+        startService(intent);
+        bindService(intent, sc, MusicListActivity.BIND_AUTO_CREATE);
         super.onStart();
     }
 
@@ -174,7 +177,7 @@ public class MusicListActivity extends AppCompatActivity {
         mMusicInfo       = hostService.getMusicInfo();
         //栏的textview内容更改和栏的可视操作
         Bitmap bitmap    = hostService.getBitmap();
-        if(bitmap != null) {
+        if(bitmap != null) { //设置封面 ( null 则设置为默认封面)
             mPicView.setImageBitmap(bitmap);
         }
         else {
@@ -305,5 +308,17 @@ public class MusicListActivity extends AppCompatActivity {
     protected void onDestroy() {
         unregisterReceiver(mReceiver);
         super.onDestroy();
+    }
+
+    /**
+     * 沉浸式状态栏
+     */
+    private void initState() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            //透明状态栏
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            //透明导航栏
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+        }
     }
 }

@@ -17,7 +17,7 @@ import java.net.Socket;
  */
 
 public class TcpServer {
-    private static final String TAG = "TcpServer";
+    private static final String TAG         = "TcpServer";
     private static final int    BUFFER_SIZE = 65536;
     private Handler             disconnectHandler;
 

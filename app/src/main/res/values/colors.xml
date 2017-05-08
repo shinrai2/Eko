@@ -3,8 +3,12 @@
     <!--<color name="colorPrimary">#3F51B5</color>-->
     <!--<color name="colorPrimaryDark">#303F9F</color>-->
     <color name="colorPrimaryDiy">#009688</color>
-    <color name="colorAccent">#FF4081</color>
-    <color name="bar_background">#F5F5F5</color>
+    <color name="colorAccent">#EAEAEA</color>
+    <color name="bar_background">#EEEEEE</color>
     <color name="colorText">#757575</color>
+    <color name="colorText_white">#FAFAFA</color>
+    <color name="colorText_light_gray">#DADADA</color>
+    <color name="backgroundTintColor">#C0C0C0</color>
     <color name="colorText_red">#EE4000</color>
+    <color name="default_background">#F0F0F0</color>
 </resources>
