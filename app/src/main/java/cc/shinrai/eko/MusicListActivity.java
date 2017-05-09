@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
@@ -16,7 +15,6 @@ import android.os.Message;
 import android.support.percent.PercentRelativeLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -25,15 +23,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.wangjie.shadowviewhelper.ShadowProperty;
 import com.wangjie.shadowviewhelper.ShadowViewHelper;
-
-import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.TimeZone;
 
 
 public class MusicListActivity extends AppCompatActivity {
@@ -207,14 +201,14 @@ public class MusicListActivity extends AppCompatActivity {
         private TextView        mSingerNameTextView;
         private TextView        mMusicTimeTextView;
         private MusicInfo       musicInfo;
-        private ImageView       isPlaying;
+        private ImageView       isPlaying; //正在播放的小喇叭
         private TextView        numberOfMusic;
 
         public void bindMusic (MusicInfo m, int position) {
             musicInfo = m;
             mMusicNameTextView.setText(musicInfo.getMusicName());
             mSingerNameTextView.setText(musicInfo.getSingerName());
-            mMusicTimeTextView.setText(formatDurationTime(musicInfo.getDurationTime()));
+            mMusicTimeTextView.setText(ShinraiAssist.formatDurationTime(musicInfo.getDurationTime()));
             numberOfMusic.setText(((Integer)position).toString());
             //播放ui调整
             musicItemRefresh();
@@ -232,15 +226,6 @@ public class MusicListActivity extends AppCompatActivity {
                 numberOfMusic.setVisibility(View.VISIBLE);
                 mMusicNameTextView.setTextColor(getResources().getColor(R.color.colorText));
             }
-        }
-
-        //格式化音乐时长的字符串成便于人阅读的时间字符串
-        private String formatDurationTime(String durationTime) {
-            int sec = Integer.parseInt(durationTime);
-            SimpleDateFormat formatter = new SimpleDateFormat("mm:ss");
-            formatter.setTimeZone(TimeZone.getTimeZone("GMT+00:00"));
-            String ms = formatter.format(sec);
-            return ms;
         }
 
         public MusicHolder(View itemView) {

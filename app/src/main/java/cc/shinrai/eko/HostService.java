@@ -164,6 +164,9 @@ public class HostService extends Service {
     public int getCurrentPosition() {
         return mediaPlayer.getCurrentPosition();
     };
+    public int getLastTime() {
+        return mediaPlayer.getDuration() - mediaPlayer.getCurrentPosition();
+    }
 
     public static Intent newIntent(Context context) {
         return new Intent(context, HostService.class);
@@ -327,5 +330,4 @@ public class HostService extends Service {
                 break;
         }
     }
-
 }

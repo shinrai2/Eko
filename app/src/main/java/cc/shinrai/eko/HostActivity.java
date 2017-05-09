@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
@@ -30,6 +29,8 @@ import android.widget.TextView;
 import com.wangjie.shadowviewhelper.ShadowProperty;
 import com.wangjie.shadowviewhelper.ShadowViewHelper;
 
+import org.w3c.dom.Text;
+
 import java.lang.reflect.Method;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -45,6 +46,8 @@ public class HostActivity extends AppCompatActivity {
     private Button              mFileButton;
     private TextView            mMusicName;
     private TextView            mSingerName;
+    private TextView            mDuringTimeTextView;
+    private TextView            mLastTimeTextView;
     private ProgressBar         mProgressBar;
     private ImageView           mCoverView;
     private WifiManager         wifiManager;
@@ -90,6 +93,10 @@ public class HostActivity extends AppCompatActivity {
             mMusicName.setText(mMusicInfo.getMusicName());
             mSingerName.setText(mMusicInfo.getSingerName());
             mProgressBar.setMax(Integer.parseInt(mMusicInfo.getDurationTime()));
+            //设置音乐时长和剩余时长
+            String during_time = ShinraiAssist.formatDurationTime(mMusicInfo.getDurationTime());
+            mDuringTimeTextView.setText(during_time);
+            mLastTimeTextView.setText("-" + during_time);
         }
         Bitmap bitmap = hostService.getBitmap();
         BitmapDrawable backgroundDrawable = hostService.getBlurBackgroundImage();
@@ -104,12 +111,14 @@ public class HostActivity extends AppCompatActivity {
         }
         else {
             mParentLinearlayout.setBackgroundResource(R.drawable.alpha_45_dark);
+            //重复调用，防止首次刷新失败导致往后再也无法生成背景
+            BackgroundRefresh();
         }
         if(hostService.isPlaying() == false) {
-            mPlay_image_button.setImageResource(R.drawable.play);
+            mPlay_image_button.setImageResource(R.drawable.xplay);
         }
         else {
-            mPlay_image_button.setImageResource(R.drawable.pause);
+            mPlay_image_button.setImageResource(R.drawable.xpause);
 
         }
     }
@@ -118,8 +127,8 @@ public class HostActivity extends AppCompatActivity {
      * 当 hostService 中的背景对象被置空，重新运算计算出背景图，设置背景图并记录至 hostService
      */
     private void BackgroundRefresh() {
-        final Bitmap bitmap = hostService.getBitmap();
         if(hostService.getBlurBackgroundImage() == null) {
+            final Bitmap bitmap = hostService.getBitmap();
             if(bitmap != null) {
                 //开启线程处理耗时操作
                 new Thread(new Runnable() {
@@ -180,7 +189,8 @@ public class HostActivity extends AppCompatActivity {
         mCoverView          = (ImageView)   findViewById(R.id.musicCover);
         mProgressBar        = (ProgressBar) findViewById(R.id.progressBar);
         mParentLinearlayout = (LinearLayout)findViewById(R.id.parentLinearlayout);
-//        mParentLinearlayout.measure(0, 0);
+        mDuringTimeTextView = (TextView)    findViewById(R.id.duringTimeTextView);
+        mLastTimeTextView   = (TextView)    findViewById(R.id.lastTimeTextView);
         ShadowViewHelper.bindShadowHelper(new ShadowProperty()
                 .setShadowColor(0x77000000)
                 .setShadowDx(3)
@@ -209,6 +219,12 @@ public class HostActivity extends AppCompatActivity {
                 switch (msg.what) {
                     case TIMER_REFRESH:
                         mProgressBar.setProgress(hostService.getCurrentPosition());
+                        int lastTime = hostService.getLastTime();
+                        //减少构造字符串，优化性能
+                        if((lastTime % 1000) < 500) {
+                            mLastTimeTextView.setText("-" +
+                                    ShinraiAssist.formatDurationTime(lastTime));
+                        }
                         break;
                     default:
                         break;
@@ -259,11 +275,11 @@ public class HostActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if(hostService.isPlaying()) {
                     hostService.play(false);
-                    mPlay_image_button.setImageResource(R.drawable.play);
+                    mPlay_image_button.setImageResource(R.drawable.xplay);
                 }
                 else {
                     hostService.play(true);
-                    mPlay_image_button.setImageResource(R.drawable.pause);
+                    mPlay_image_button.setImageResource(R.drawable.xpause);
                 }
             }
         });

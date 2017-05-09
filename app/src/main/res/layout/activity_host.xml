@@ -99,7 +99,6 @@
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentStart="true"
                     android:layout_below="@+id/progressBar"
-                    android:text="4:00"
                     android:textColor="@color/colorText_white"/>
 
                 <TextView
@@ -109,7 +108,6 @@
                     android:layout_alignParentEnd="true"
                     android:layout_alignParentRight="true"
                     android:layout_below="@+id/progressBar"
-                    android:text="-1:25"
                     android:textColor="@color/colorText_white"/>
             </RelativeLayout>
 
@@ -118,8 +116,6 @@
     </android.support.percent.PercentRelativeLayout>
 
     <android.support.percent.PercentRelativeLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_gravity="center_horizontal"
@@ -149,8 +145,10 @@
 
         <ImageButton
             android:id="@+id/play_image_button"
-            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_marginLeft="@dimen/button_margin"
+            android:layout_marginRight="@dimen/button_margin"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
             android:adjustViewBounds="true"
@@ -158,14 +156,15 @@
             android:contentDescription=""
             android:cropToPadding="false"
             android:scaleType="fitXY"
-            app:srcCompat="@drawable/pause"
+            app:layout_aspectRatio="100%"
+            app:srcCompat="@drawable/xpause"
             tools:ignore="ContentDescription,UnusedAttribute"/>
 
         <ImageButton
             android:id="@+id/next_image_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignTop="@+id/play_image_button"
+            android:layout_alignTop="@+id/before_image_button"
             android:layout_toEndOf="@+id/play_image_button"
             android:layout_toRightOf="@+id/play_image_button"
             android:adjustViewBounds="true"
@@ -173,14 +172,14 @@
             android:contentDescription=""
             android:cropToPadding="false"
             android:scaleType="fitXY"
-            app:srcCompat="@drawable/navigate_next"
+            app:srcCompat="@drawable/xfw"
             tools:ignore="ContentDescription,UnusedAttribute"/>
 
         <ImageButton
             android:id="@+id/before_image_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignTop="@+id/play_image_button"
+            android:layout_centerVertical="true"
             android:layout_toLeftOf="@+id/play_image_button"
             android:layout_toStartOf="@+id/play_image_button"
             android:adjustViewBounds="true"
@@ -188,7 +187,7 @@
             android:contentDescription=""
             android:cropToPadding="false"
             android:scaleType="fitXY"
-            app:srcCompat="@drawable/navigate_before"
+            app:srcCompat="@drawable/xrw"
             tools:ignore="ContentDescription,UnusedAttribute"/>
 
         <ImageButton
@@ -203,8 +202,8 @@
             android:cropToPadding="false"
             android:scaleType="centerCrop"
             app:layout_aspectRatio="100%"
-            app:layout_heightPercent="58%"
-            app:srcCompat="@drawable/list_cycle"
+            app:layout_heightPercent="40%"
+            app:srcCompat="@drawable/xrepeat"
             tools:ignore="ContentDescription,UnusedAttribute"/>
 
     </android.support.percent.PercentRelativeLayout>
