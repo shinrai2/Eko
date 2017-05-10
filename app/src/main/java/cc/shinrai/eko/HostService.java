@@ -248,12 +248,8 @@ public class HostService extends Service {
             musicInfo.setCurrentMusic(true);
 
             final String tmpath = MusicLab.getBasePath() + musicInfo.getPath();
-            //发送tcp
-            tcpSend(tmpath, null);
 
             mMusicInfo = musicInfo;
-            //设置发送文件的路径
-//            mSocketServer.setPath(tmpath);
             if(mediaPlayer.isPlaying() == true) {
                 mediaPlayer.pause();
             }
@@ -281,7 +277,8 @@ public class HostService extends Service {
                     sendBroadcast();
                 }
             }).start();
-
+            //发送tcp
+            tcpSend(tmpath, null);
         }
         else {
             if(mediaPlayer.isPlaying() == false) {

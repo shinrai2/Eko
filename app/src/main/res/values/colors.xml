@@ -6,7 +6,7 @@
     <color name="colorText">#757575</color>
     <color name="colorText_white">#FAFAFA</color>
     <color name="colorText_light_gray">#DADADA</color>
-    <color name="backgroundTintColor">#C0C0C0</color>
+    <color name="backgroundTintColor">#CFCFCF</color>
     <color name="colorText_red">#EE4000</color>
     <color name="default_background">#F0F0F0</color>
 </resources>
