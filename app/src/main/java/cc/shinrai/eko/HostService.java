@@ -133,6 +133,8 @@ public class HostService extends Service {
         Log.i(TAG, "path : " + path + " specifyAddress : " + specifyAddress);
         String msg = getCurrentMusicPosition() + "-" + getCurrentPosition() +
                 "-" + new Date().getTime() + "-" + (path!=null?"1":"0");
+        //防止出问题时被甩锅的专用LOG :p
+        Log.i(TAG, msg);
         List<String> addressList = mUdpClient.getAddressList();
         if(specifyAddress == null) {
             for(String address : addressList) {
