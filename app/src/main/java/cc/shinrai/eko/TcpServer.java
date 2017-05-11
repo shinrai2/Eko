@@ -1,5 +1,6 @@
 package cc.shinrai.eko;
 
+import android.media.MediaPlayer;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -11,6 +12,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.Date;
 
 /**
  * Created by Shinrai on 2017/5/4 0004.
@@ -25,7 +27,14 @@ public class TcpServer {
         this.disconnectHandler = handler;
     }
 
-    public void connect(final String address, final String head, final String musicPath) {
+    /**
+     * 通过tcp协议连接指定的设备并发送、接收信息和文件。
+     * @param address 要进行连接的目的地址。
+     * @param mediaPlayer 播放器的实例，在发送前获取currentPosition，以降低tcp协议建立的耗时导致的延时
+     * @param musicPath 要发送的音乐文件的储存地址， null 代表不发送。
+     * @param position 现在播放的音乐在音乐列表中的位置。
+     */
+    public void connect(final String address, final MediaPlayer mediaPlayer, final String musicPath, final int position) {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -33,7 +42,10 @@ public class TcpServer {
                     Socket socket = new Socket(address, 9999);
                     OutputStream outStream = socket.getOutputStream();
                     //发送信息头
-                    String xhead = head + "\n";
+//                    String xhead = head + "\n";
+                    //发送前再构造，尽可能减少延时
+                    String xhead = position + "-" + mediaPlayer.getCurrentPosition() +
+                            "-" + new Date().getTime() + "-" + (musicPath!=null?"1":"0") + "\n";
                     outStream.write(xhead.getBytes());
                     outStream.flush();
                     Log.i(TAG, xhead);

@@ -55,7 +55,7 @@ public class HostService extends Service {
         if (mMusicInfo == null) {
             return -1;
         }
-        return musicInfoList.indexOf(mMusicInfo);
+        return getMusicPosition(mMusicInfo);
     }
     //获取指定音乐信息的目录位置
     public int getMusicPosition(MusicInfo musicInfo) {
@@ -131,18 +131,18 @@ public class HostService extends Service {
      */
     private void tcpSend(String path, String specifyAddress) {
         Log.i(TAG, "path : " + path + " specifyAddress : " + specifyAddress);
-        String msg = getCurrentMusicPosition() + "-" + getCurrentPosition() +
-                "-" + new Date().getTime() + "-" + (path!=null?"1":"0");
+//        String msg = getCurrentMusicPosition() + "-" + getCurrentPosition() +
+//                "-" + new Date().getTime() + "-" + (path!=null?"1":"0");
         //防止出问题时被甩锅的专用LOG :p
-        Log.i(TAG, msg);
+//        Log.i(TAG, msg);
         List<String> addressList = mUdpClient.getAddressList();
         if(specifyAddress == null) {
             for(String address : addressList) {
-                mTcpServer.connect(address, msg, path);
+                mTcpServer.connect(address, mediaPlayer, path, getCurrentMusicPosition());
             }
         }
         else {
-            mTcpServer.connect(specifyAddress, msg, path);
+            mTcpServer.connect(specifyAddress, mediaPlayer, path, getCurrentMusicPosition());
         }
     }
     //改变播放状态(操作用)
