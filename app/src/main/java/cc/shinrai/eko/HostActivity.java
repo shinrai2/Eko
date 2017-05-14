@@ -48,6 +48,7 @@ public class HostActivity extends AppCompatActivity {
     private TextView            mSingerName;
     private TextView            mDuringTimeTextView;
     private TextView            mLastTimeTextView;
+    private TextView            mDebugTextView;
     private ProgressBar         mProgressBar;
     private ImageView           mCoverView;
     private WifiManager         wifiManager;
@@ -191,6 +192,7 @@ public class HostActivity extends AppCompatActivity {
         mParentLinearlayout = (LinearLayout)findViewById(R.id.parentLinearlayout);
         mDuringTimeTextView = (TextView)    findViewById(R.id.duringTimeTextView);
         mLastTimeTextView   = (TextView)    findViewById(R.id.lastTimeTextView);
+        mDebugTextView      = (TextView)    findViewById(R.id.debugTextView);
         ShadowViewHelper.bindShadowHelper(new ShadowProperty()
                 .setShadowColor(0x77000000)
                 .setShadowDx(3)
@@ -218,9 +220,11 @@ public class HostActivity extends AppCompatActivity {
             public void handleMessage(Message msg) {
                 switch (msg.what) {
                     case TIMER_REFRESH:
-                        mProgressBar.setProgress(hostService.getCurrentPosition());
-                        int lastTime = hostService.getLastTime();
+                        int currentPosition = hostService.getCurrentPosition();
+                        mProgressBar.setProgress(currentPosition);
+                        mDebugTextView.setText(((Integer)currentPosition).toString());
                         //减少构造字符串，优化性能
+                        int lastTime = hostService.getLastTime();
                         if((lastTime % 1000) < 500) {
                             mLastTimeTextView.setText("-" +
                                     ShinraiAssist.formatDurationTime(lastTime));

@@ -109,6 +109,14 @@
                     android:layout_alignParentRight="true"
                     android:layout_below="@+id/progressBar"
                     android:textColor="@color/colorText_white"/>
+
+                <TextView
+                    android:id="@+id/debugTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/progressBar"
+                    android:layout_centerHorizontal="true"
+                    android:textColor="@color/colorText_white"/>
             </RelativeLayout>
 
         </LinearLayout>
