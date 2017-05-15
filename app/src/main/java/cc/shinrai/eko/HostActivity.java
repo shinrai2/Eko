@@ -222,6 +222,7 @@ public class HostActivity extends AppCompatActivity {
                     case TIMER_REFRESH:
                         int currentPosition = hostService.getCurrentPosition();
                         mProgressBar.setProgress(currentPosition);
+                        //显示播放器的现行播放位置，方便调试。！！关闭调试请注释。
                         mDebugTextView.setText(((Integer)currentPosition).toString());
                         //减少构造字符串，优化性能
                         int lastTime = hostService.getLastTime();

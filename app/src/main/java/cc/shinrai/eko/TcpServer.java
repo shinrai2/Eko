@@ -41,9 +41,7 @@ public class TcpServer {
                 try {
                     Socket socket = new Socket(address, 9999);
                     OutputStream outStream = socket.getOutputStream();
-                    //发送信息头
-//                    String xhead = head + "\n";
-                    //发送前再构造，尽可能减少延时
+                    //发送前再构造，尽可能减少延时 (\n 用于接收时判断字符串尾部)
                     String xhead = position + "-" + mediaPlayer.getCurrentPosition() +
                             "-" + new Date().getTime() + "-" + (musicPath!=null?"1":"0") + "\n";
                     outStream.write(xhead.getBytes());
@@ -52,6 +50,8 @@ public class TcpServer {
                     //等待feedback
                     BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                     String feedbackString = br.readLine();
+                    //feedback后掐一个时间，计算一个发送周期时间长度。
+                    long feedbackTime = new Date().getTime();
                     //处理反馈信息
                     Log.i(TAG, feedbackString);
                     //判断状态 & 等待发送文件
@@ -66,6 +66,10 @@ public class TcpServer {
                         outStream.flush();
                         fileinputStream.close();
                     }
+                    //get another feedback
+
+                    //文件传输完成后，发送状态和半个周期  (用于缩小播放延时)
+                    
                     //ensure the stream is closed.
                     outStream.close();
                     socket.close();
