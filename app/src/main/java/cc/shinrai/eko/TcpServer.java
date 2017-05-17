@@ -58,19 +58,20 @@ public class TcpServer {
                     if(musicPath != null) {
                         InputStream fileinputStream = new FileInputStream(musicPath);
                         byte writebuffer[] = new byte[BUFFER_SIZE];
-                        int wtemp = 0;
-                        while ((wtemp = fileinputStream.read(writebuffer)) != -1) {
-                            outStream.write(writebuffer, 0, wtemp);
+                        int len = 0;
+                        while ((len = fileinputStream.read(writebuffer)) != -1) {
+                            outStream.write(writebuffer, 0, len);
                         }
                         Log.i(TAG, "file sent.");
                         outStream.flush();
                         fileinputStream.close();
                     }
                     //get another feedback
-
+                    String anotherFeedbackString = br.readLine();
                     //文件传输完成后，发送状态和半个周期  (用于缩小播放延时)
-                    
+
                     //ensure the stream is closed.
+                    br.close();
                     outStream.close();
                     socket.close();
                 }
