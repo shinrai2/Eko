@@ -25,6 +25,9 @@ import wseemann.media.FFmpegMediaMetadataRetriever;
 public class HostService extends Service {
     public static final int     NEW_CONNECT_USER    = 11;
     public static final int     DISCONNECT_USER     = 13;
+//    public static final int     DELETE_BEFORE_TCP   = 2;
+    public static final int     READD_AFTER_TCP     = 4;
+
     public static final int     CYCLE_SWITCH        = 21;
     public static final int     REPEAT_ONE_SWITCH   = 23;
     public static final int     SHUFFLE_SWITCH      = 27;
@@ -134,10 +137,12 @@ public class HostService extends Service {
         List<String> addressList = mUdpClient.getAddressList();
         if(specifyAddress == null) {
             for(String address : addressList) {
+                mUdpClient.deleteAddress(address);
                 mTcpServer.connect(address, mediaPlayer, path, getCurrentMusicPosition());
             }
         }
         else {
+//            mUdpClient.deleteAddress(specifyAddress);
             mTcpServer.connect(specifyAddress, mediaPlayer, path, getCurrentMusicPosition());
         }
     }
@@ -172,8 +177,6 @@ public class HostService extends Service {
 
     @Override
     public void onDestroy() {
-//        udpServer.closeSocket();
-//        mSocketServer.stopSocket();
         mUdpClient.stopReceive();
         Log.i(TAG, "onDestroy");
         super.onDestroy();
@@ -202,8 +205,15 @@ public class HostService extends Service {
                     case NEW_CONNECT_USER:
                         tcpSend(MusicLab.getBasePath() + mMusicInfo.getPath(), (String) msg.obj);
                         break;
-                    case DISCONNECT_USER:
+                    case DISCONNECT_USER:   //在传输中出错，视为断开连接，删除该ip记录
                         mUdpClient.deleteAddress((String) msg.obj);
+                        break;
+                    /*
+                        下面的case的作用是在tcp协议过程后将ip重新添加到列表中。
+                     */
+                    case READD_AFTER_TCP:
+                        mUdpClient.addAddress((String) msg.obj);
+                        break;
                     default:
                         break;
                 }

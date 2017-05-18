@@ -51,8 +51,11 @@ public class UdpClient {
                             multicastSocket.receive(dp);
                             String info = new String(buf, 0, dp.getLength());
                             Log.i(TAG, info);
-                            //解析并添加到列表中
-                            addAddress(parseRegexString(info, _regex));
+                            //通过handler向解析的ip发送请求
+                            Message msg = new Message();
+                            msg.what = HostService.NEW_CONNECT_USER;
+                            msg.obj = parseRegexString(info, _regex);
+                            newConnectHandler.sendMessage(msg);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -81,15 +84,10 @@ public class UdpClient {
         return null;
     }
 
-    private void addAddress(String address) {
+    public void addAddress(String address) {
         //如果地址在列表中不存在
         if(!addressList.contains(address)) {
             addressList.add(address);
-            //send tcp
-            Message msg = new Message();
-            msg.what = HostService.NEW_CONNECT_USER;
-            msg.obj = address;
-            newConnectHandler.sendMessage(msg);
         }
     }
     //tcp发送失败时，删除记录

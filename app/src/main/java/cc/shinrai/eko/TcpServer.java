@@ -42,20 +42,21 @@ public class TcpServer {
                     Socket socket = new Socket(address, 9999);
                     OutputStream outStream = socket.getOutputStream();
                     //发送前再构造，尽可能减少延时 (\n 用于接收时判断字符串尾部)
-                    String xhead = position + "-" + mediaPlayer.getCurrentPosition() +
-                            "-" + new Date().getTime() + "-" + (musicPath!=null?"1":"0") + "\n";
+                    long startTimeOfCycle = System.currentTimeMillis(); //先掐一个周期开始时间
+                    String xhead = position                    + "-"
+                            + mediaPlayer.getCurrentPosition() + "\n";
                     outStream.write(xhead.getBytes());
                     outStream.flush();
                     Log.i(TAG, xhead);
                     //等待feedback
                     BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                     String feedbackString = br.readLine();
-                    //feedback后掐一个时间，计算一个发送周期时间长度。
-                    long feedbackTime = new Date().getTime();
+                    //feedback后掐一个周期结束时间。
+                    long endTimeOfCycle = System.currentTimeMillis();;
                     //处理反馈信息
-                    Log.i(TAG, feedbackString);
+                    Log.i(TAG, "feedbackString : " + feedbackString);
                     //判断状态 & 等待发送文件
-                    if(musicPath != null) {
+                    if(musicPath != null && feedbackString.equals("1")) {
                         InputStream fileinputStream = new FileInputStream(musicPath);
                         byte writebuffer[] = new byte[BUFFER_SIZE];
                         int len = 0;
@@ -65,15 +66,26 @@ public class TcpServer {
                         Log.i(TAG, "file sent.");
                         outStream.flush();
                         fileinputStream.close();
+                        //get another feedback
+                        String anotherFeedbackString = br.readLine();
+                        Log.i(TAG, "anotherFeedbackString : " + anotherFeedbackString);
                     }
-                    //get another feedback
-                    String anotherFeedbackString = br.readLine();
+                    //获取周期开始时间，计算半个周期长度。
+                    long halfTimeOfCycle = (endTimeOfCycle - startTimeOfCycle)/2;
+                    Log.i(TAG, "halfTimeOfCycle is : " + halfTimeOfCycle);
                     //文件传输完成后，发送状态和半个周期  (用于缩小播放延时)
-
+                    String xtail = (mediaPlayer.isPlaying()?"1":"0") + "-" + halfTimeOfCycle;
+                    outStream.write(xtail.getBytes());
+                    outStream.flush();
+                    Log.i(TAG, "xtail is : " + xtail);
                     //ensure the stream is closed.
                     br.close();
                     outStream.close();
                     socket.close();
+                    Message msg2 = new Message();
+                    msg2.what = HostService.READD_AFTER_TCP;
+                    msg2.obj = address;
+                    disconnectHandler.sendMessage(msg2);
                 }
                 catch (Exception e) {
                     e.printStackTrace();
@@ -87,5 +99,4 @@ public class TcpServer {
             }
         }).start();
     }
-
 }
