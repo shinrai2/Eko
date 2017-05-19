@@ -42,9 +42,9 @@ public class TcpServer {
                     Socket socket = new Socket(address, 9999);
                     OutputStream outStream = socket.getOutputStream();
                     //发送前再构造，尽可能减少延时 (\n 用于接收时判断字符串尾部)
-                    long startTimeOfCycle = System.currentTimeMillis(); //先掐一个周期开始时间
                     String xhead = position                    + "-"
                             + mediaPlayer.getCurrentPosition() + "\n";
+                    long startTimeOfCycle = System.currentTimeMillis(); //先掐一个周期开始时间
                     outStream.write(xhead.getBytes());
                     outStream.flush();
                     Log.i(TAG, xhead);
@@ -74,7 +74,7 @@ public class TcpServer {
                     long halfTimeOfCycle = (endTimeOfCycle - startTimeOfCycle)/2;
                     Log.i(TAG, "halfTimeOfCycle is : " + halfTimeOfCycle);
                     //文件传输完成后，发送状态和半个周期  (用于缩小播放延时)
-                    String xtail = (mediaPlayer.isPlaying()?"1":"0") + "-" + halfTimeOfCycle;
+                    String xtail = (mediaPlayer.isPlaying()?"1":"0") + "-" + 0;
                     outStream.write(xtail.getBytes());
                     outStream.flush();
                     Log.i(TAG, "xtail is : " + xtail);
